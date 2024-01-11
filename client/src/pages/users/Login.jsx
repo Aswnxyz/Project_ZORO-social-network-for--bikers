@@ -51,6 +51,7 @@ function Login() {
       dispatch(setCredentials({ ...res }));
       navigate("/");
     } catch (error) {
+      // console.log(error)
       toast.error(error.data);
     }
   };

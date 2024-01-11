@@ -128,6 +128,26 @@ export const userApiSlice = apiSlice.injectEndpoints({
         params:data
       }),
     }),
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/changePassword`,
+        method: "POST",
+        body:data
+      }),
+    }),
+    changeToPrivateAccount: builder.mutation({
+      query: () => ({
+        url: `${USERS_URL}/changePrivateAccount`,
+        method: "PATCH",
+      }),
+    }),
+    manageFollowRequest: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/followRequest`,
+        method: "POST",
+        body:data
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -150,5 +170,8 @@ export const {
   useAddToRecentSearchMutation,
   useGetRecentSearcheMutation,
   useClearRecentSearchMutation,
-  useGetUserDataMutation
+  useGetUserDataMutation,
+  useChangePasswordMutation,
+  useChangeToPrivateAccountMutation,
+  useManageFollowRequestMutation
 } = userApiSlice;

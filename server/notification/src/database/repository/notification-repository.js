@@ -34,35 +34,40 @@ class NotificationRepository {
     await NotificationModel.findOneAndDelete({ _id });
   }
   async getNotificationsByUserId(userId) {
-    return await NotificationModel.find({ recipient: userId });
+    return await NotificationModel.find({ recipient: userId ,sender:{$ne:userId}});
   }
-  async removeNotification({ sender, postId, type, commentId ,recipient}) {
-  const query = {};
+  async removeNotification({ sender, postId, type, commentId, recipient }) {
+    const query = {};
 
-  if (postId && type === "like") {
-    // For 'like' type, delete by sender and post ID
-    query["contentDetails.postId"] = postId;
-  } else if (commentId && type === "comment") {
-    // For 'comment' type, delete by sender and comment ID
-    query["contentDetails.commentId"] = commentId;
-  }
+    if (postId && type === "like") {
+      // For 'like' type, delete by sender and post ID
+      query["contentDetails.postId"] = postId;
+    } else if (commentId && type === "comment") {
+      // For 'comment' type, delete by sender and comment ID
+      query["contentDetails.commentId"] = commentId;
+    }
 
-  query["sender"] = sender;
+    query["sender"] = sender;
 
-  if (type === "follow") {
-    // For 'follow' type, include recipient in the query
-    query["recipient"] = recipient;
-  }
+    if (type === "follow" || type ==="followRequest") {
+      // For 'follow' type, include recipient in the query
+      query["recipient"] = recipient;
+    }
     return await NotificationModel.findOneAndDelete(query);
     // return await NotificationModel.findOneAndDelete({ sender ,"contentDetails.postId":postId});
   }
 
-
-  async getUnreadNotifications(userId){
-    return await NotificationModel.find({recipient:userId,isRead:false}).countDocuments()
+  async getUnreadNotifications(userId) {
+    return await NotificationModel.find({
+      recipient: userId,
+      isRead: false,
+    }).countDocuments();
   }
-  async clearUnreadNotifications(userId){
-    await NotificationModel.updateMany({recipient:userId},{$set:{isRead:true}})
+  async clearUnreadNotifications(userId) {
+    await NotificationModel.updateMany(
+      { recipient: userId },
+      { $set: { isRead: true } }
+    );
   }
 }
 

@@ -12,15 +12,20 @@ import {
   IoPeopleOutline,
   IoPersonOutline,
 } from "react-icons/io5";
+import { FaBars } from "react-icons/fa";
+
 import { BsSearch } from "react-icons/bs";
 import { BsBell } from "react-icons/bs";
 import { SlEnvolope } from "react-icons/sl";
 import { CiSquarePlus } from "react-icons/ci";
 import socket from "../utils/socket";
 import messageSocket from "../utils/messageSocket";
+import MoreModal from "./Modals/MoreModal";
 
 const Sidebar = ({ setShowCreatePostModal }) => {
+  const [openModal, setOpenModal] = useState(false);
   const [unreadNotifications, setunreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [logoutUser] = useLogoutMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -36,16 +41,26 @@ const Sidebar = ({ setShowCreatePostModal }) => {
     }
   };
 
+  messageSocket.on("connected", () =>
+    console.log("connected to message socket")
+  );
+  messageSocket.on("message", () => setUnreadMessages(unreadMessages + 1));
+  messageSocket.on("unreadMessages", (data) => {
+    // console.log("unreadMessages")
+    setUnreadMessages(data);
+  });
   socket.on("connected", () => {
     console.log("connected");
   });
-  messageSocket.on("connected", () => console.log("connected to message socket"));
   socket.on("unreadNotifications", (data) => {
     setunreadNotifications(data);
   });
   socket.on("notification", () =>
     setunreadNotifications(unreadNotifications + 1)
   );
+  socket.on("removeNotification", () => {
+    setunreadNotifications(unreadNotifications - 1);
+  });
 
   useEffect(() => {
     socket.emit("registerUser", userInfo.id);
@@ -117,6 +132,11 @@ const Sidebar = ({ setShowCreatePostModal }) => {
                   <span className="flex-1 ms-3 whitespace-nowrap">
                     Messages
                   </span>
+                  {unreadMessages > 0 && (
+                    <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                      {unreadMessages}
+                    </span>
+                  )}
                 </div>
               </Link>
             </li>
@@ -161,7 +181,7 @@ const Sidebar = ({ setShowCreatePostModal }) => {
                 </div>
               </Link>
             </li>
-            <li>
+            {/* <li>
               <div className="flex items-center p-2 text-gray-900 rounded-lg dark:text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 <svg
                   className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -181,8 +201,24 @@ const Sidebar = ({ setShowCreatePostModal }) => {
                   Logout
                 </span>
               </div>
-            </li>
+            </li> */}
           </ul>
+          <div
+            onClick={() => setOpenModal(!openModal)}
+            className="flex absolute bottom-0 mb-4 space-x-4 items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          >
+            <FaBars
+              className=" text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+              size={26}
+            />
+            <span className="flex-1 ms-3 whitespace-nowrap">More</span>
+          </div>
+          {openModal && (
+            <MoreModal
+              logout={handleLogout}
+              onClose={() => setOpenModal(false)}
+            />
+          )}
         </div>
       </aside>
     </>

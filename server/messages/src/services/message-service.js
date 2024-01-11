@@ -54,6 +54,15 @@ class MessageService {
     return recentChattedUsersData;
   }
 
+  async readMessage(data){
+    return await this.repository.readMessage(data)
+
+  }
+
+  async getUnreadMessages(userId){
+    return await this.repository.unreadedMessages(userId)
+  }
+
   // RPC Response
   async serveRPCRequest(payload) {
     const { type, data } = payload;

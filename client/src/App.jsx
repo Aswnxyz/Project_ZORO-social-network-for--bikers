@@ -21,8 +21,11 @@ import PostManagement from "./pages/admin/PostManagement";
 import Explore from "./pages/users/Explore";
 import Notifications from "./pages/users/Notifications";
 import Messages from "./pages/users/Messages";
-
-
+import Settings from "./components/Settings";
+import YourAccount from "./components/YourAccount";
+import AccountInformation from "./components/AccountInformation";
+import ChangeYourPassword from "./components/ChangeYourPassword";
+import AccountPrivacy from "./components/AccountPrivacy";
 
 const router = createBrowserRouter([
   {
@@ -59,16 +62,38 @@ const router = createBrowserRouter([
           },
           {
             path: "/notifications",
-            element:<Notifications/>
+            element: <Notifications />,
           },
           {
-            path:"/messages",
-            element:<Messages/>
+            path: "/messages",
+            element: <Messages />,
           },
           {
-            path:"/messages/:userId",
-            element:<Messages/>
-          }
+            path: "/messages/:userId",
+            element: <Messages />,
+          },
+          {
+            path: "/settings",
+            element: <Settings />,
+            children: [
+              {
+                path: "account",
+                element: <YourAccount />,
+              },
+              {
+                path: "your-zoro-account",
+                element: <AccountInformation />,
+              },
+              {
+                path: "password",
+                element: <ChangeYourPassword />,
+              },
+              {
+                path: "privacy-setting",
+                element:<AccountPrivacy/>
+              },
+            ],
+          },
         ],
       },
     ],
@@ -103,7 +128,6 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
- 
   return (
     <GoogleOAuthProvider clientId="269741526603-9fhnome52gfetuagivuf2amaf8u1emar.apps.googleusercontent.com">
       <Provider store={store}>

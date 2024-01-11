@@ -2,19 +2,29 @@ const PostService = require("../services/post-service");
 const userAuth = require("./middlewares/auth");
 const { RPCObserver, PublishMessage } = require("../utils");
 const { NOTIFICATION_SERVICE } = require("../config");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 module.exports = (app, channel) => {
   const service = new PostService();
 
   RPCObserver("POSTS_RPC", service);
 
-  app.post("/createPost", userAuth, async (req, res, next) => {
+  app.post("/createPost", userAuth,upload.single("image"), async (req, res, next) => {
     try {
-      const postData = req.body;
-      const { _id } = req.user;
+      console.log("req.body", req.body);
+      console.log("req.file", req.file);
+      const des = req.body.des;
+      const image = req.file.buffer
+      const data = await service.createPost(req,req.user._id)
+      return res.json({})
 
-      const data = await service.createPost(postData, _id);
+      // const postData = req.body;
+      // const { _id } = req.user;
 
-      return res.status(200).json(data);
+      // const data = await service.createPost(postData, _id);
+
+      // return res.status(200).json(data);
     } catch (error) {
       next(error);
     }

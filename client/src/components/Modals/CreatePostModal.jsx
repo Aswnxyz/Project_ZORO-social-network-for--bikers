@@ -73,10 +73,16 @@ const CreatPostModal = ({ open, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      const res = await createPost({
-        des: caption,
-        media: croppedImage,
-      }).unwrap();
+      console.log(croppedImage)
+      const formData = new FormData();
+      formData.append("image", croppedImage);
+      formData.append("des",caption)
+    
+      // const res = await createPost({
+      //   des: caption,
+      //   media: croppedImage,
+      // }).unwrap();
+      const res = await createPost(formData).unwrap();
       console.log(res);
       setCaption("");
       setCroppedImage("");
@@ -84,9 +90,24 @@ const CreatPostModal = ({ open, onClose }) => {
       window.location.reload();
       window.scrollTo(0, 0);
     } catch (error) {
-      console.log(error);
+      console.log(error.data);
     }
   };
+
+  function dataURLtoBlob(dataURL) {
+    const arr = dataURL.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new Blob([u8arr], { type: mime });
+  }
+
 
   if (!open) return null;
   return (
@@ -130,7 +151,18 @@ const CreatPostModal = ({ open, onClose }) => {
                     );
                     const dataUrl = previewCanvasRef.current.toDataURL();
                     previewCanvasRef.current.style.display = "block";
-                    setCroppedImage(dataUrl);
+
+                    const blob = dataURLtoBlob(dataUrl);
+
+                    
+
+                    // Create a File from the Blob
+                    const file = new File([blob], "cropped_image.jpg", {
+                      type: "image/jpeg",
+                    });
+
+                    // console.log(file);
+                    setCroppedImage(file);
                     setOpenCropper(false);
                     // console.log(dataUrl);
                   }}
@@ -204,7 +236,7 @@ const CreatPostModal = ({ open, onClose }) => {
           {!openCropper && (
             <>
               {" "}
-              <hr class="h-px mt-16  bg-gray-200 border-0 dark:bg-gray-700" />
+              <hr className="h-px mt-16  bg-gray-200 border-0 dark:bg-gray-700" />
               <div className="flex p-4 justify-between">
                 <div className="flex space-x-4">
                   <div>

@@ -31,6 +31,7 @@ const UserSchema = new Schema(
     isActive: { type: Boolean, default: true },
     following: [Schema.Types.ObjectId],
     followers: [Schema.Types.ObjectId],
+    followRequests:[Schema.Types.ObjectId],
     savedPosts: [Schema.Types.ObjectId],
     garage: [
       {
@@ -53,6 +54,12 @@ const UserSchema = new Schema(
         timestamp: { type: Date, default: Date.now },
       },
     ],
+    phone:{type:String},
+    country:{type:String},
+    gender:{type:String},
+    dataOfBirth:{type:Date},
+    privateAccount:{type:Boolean}
+
   },
   { timestamps: true }
 );

@@ -3,7 +3,7 @@ const userAuth = require("./middlewares/auth");
 const { RPCObserver, PublishMessage } = require("../utils");
 const { NOTIFICATION_SERVICE } = require("../config");
 
-module.exports = (app,channel) => {
+module.exports = (app, channel) => {
   const service = new UserService();
 
   RPCObserver("USERS_RPC", service);
@@ -98,8 +98,8 @@ module.exports = (app,channel) => {
   app.post("/followUser", userAuth, async (req, res, next) => {
     try {
       const { _id } = req.user;
-      const {data,payload} = await service.followUser(req.body, _id);
-      PublishMessage(channel,NOTIFICATION_SERVICE, JSON.stringify(payload));
+      const { data, payload } = await service.followUser(req.body, _id);
+      PublishMessage(channel, NOTIFICATION_SERVICE, JSON.stringify(payload));
       return res.status(200).json(data);
     } catch (error) {
       next(error);
@@ -124,62 +124,99 @@ module.exports = (app,channel) => {
     }
   });
 
-  app.post("/getSavedPosts",userAuth,async(req,res,next)=>{
+  app.post("/getSavedPosts", userAuth, async (req, res, next) => {
     try {
       const data = await service.getSavedPosts(req.body);
-      return res.status(200).json(data)
+      return res.status(200).json(data);
     } catch (error) {
-      next(error)
+      next(error);
     }
   });
 
-  app.post("/createGarage",userAuth,async (req,res,next)=>{
+  app.post("/createGarage", userAuth, async (req, res, next) => {
     try {
-      const data = await service.createGarage(req.body,req.user._id);
+      const data = await service.createGarage(req.body, req.user._id);
 
-      return res.status(200).json(data)
+      return res.status(200).json(data);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  })
-  app.get("/searchUsers",userAuth,async(req,res,next)=>{
+  });
+  app.get("/searchUsers", userAuth, async (req, res, next) => {
     try {
-     const data = await service.repository.searchUser(req.query);
-     res.status(200).json(data)
+      const data = await service.repository.searchUser(req.query);
+      res.status(200).json(data);
     } catch (error) {
-      next(error)
+      next(error);
     }
   });
 
-  app.post("/addRecentSearch",userAuth,async(req,res,next)=>{
+  app.post("/addRecentSearch", userAuth, async (req, res, next) => {
     try {
-      const data = await service.addToRecentSearch(req.body,req.user._id);
-      return res.status(200).json(data)
+      const data = await service.addToRecentSearch(req.body, req.user._id);
+      return res.status(200).json(data);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  })
+  });
 
-  app.get("/getRecentSearches",userAuth,async(req,res,next)=>{
+  app.get("/getRecentSearches", userAuth, async (req, res, next) => {
     try {
       const data = await service.getRecentUsers(req.user._id);
-      return res.status(200).json(data)
+      return res.status(200).json(data);
     } catch (error) {
-      next(error)
+      next(error);
     }
   });
 
-  app.delete("/clearRecentSearch",userAuth,async(req,res,next)=>{
+  app.delete("/clearRecentSearch", userAuth, async (req, res, next) => {
     try {
       const data = await service.clearRecentSearch(req.user._id);
-      return res.json(data)
+      return res.json(data);
     } catch (error) {
-      next(error)
+      next(error);
     }
   });
   app.get("/getUserDataWithMessages", userAuth, async (req, res, next) => {
     try {
-      const data = await service.getUserDataWithMessages(req.query.userId,req.user._id)
+      const data = await service.getUserDataWithMessages(
+        req.query.userId,
+        req.user._id
+      );
+      return res.status(200).json(data);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/changePassword", userAuth, async (req, res, next) => {
+    try {
+      const data = await service.changePassword(req.body, req.user._id);
+      return res.json(data);
+    } catch (error) {
+      next(error);
+    }
+  });
+  app.patch("/changePrivateAccount", userAuth, async (req, res, next) => {
+    try {
+      const data = await service.managePrivateAccount(req.user._id);
+      return res.status(200).json(data);
+    } catch (error) {
+      next(error);
+    }
+  });
+  app.post("/followRequest", userAuth, async (req, res, next) => {
+    try {
+      const { data, removePayload, payload } =
+        await service.manageFollowRequest(req.body, req.user._id);
+      PublishMessage(
+        channel,
+        NOTIFICATION_SERVICE,
+        JSON.stringify(removePayload)
+      );
+      if (payload) {
+        PublishMessage(channel, NOTIFICATION_SERVICE, JSON.stringify(payload));
+      }
       return res.status(200).json(data);
     } catch (error) {
       next(error);

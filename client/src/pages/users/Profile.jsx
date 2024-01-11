@@ -14,6 +14,7 @@ import FollowersModal from "../../components/Modals/FollowersModal";
 import UserPosts from "../../components/UserPosts";
 import UserSavedPosts from "../../components/UserSavedPosts";
 import CreateGarageModal from "../../components/Modals/CreateGarageModal";
+import PrivateComponent from "../../components/PrivateComponent";
 const Profile = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [userData, setUserData] = useState({});
@@ -39,10 +40,13 @@ const Profile = () => {
   const handleFollowing = async (state) => {
     try {
       const res = await followUser({ userName, state }).unwrap();
-      setUserData((prevData) => ({
-        ...prevData,
-        followers: res.followers,
-      }));
+      if (res) {
+        // setUserData((prevData) => ({
+        //   ...prevData,
+        //   followers: res.followers,
+        // }));
+        setUserData(res)
+      }
     } catch (error) {
       console.log(error);
     }
@@ -52,6 +56,7 @@ const Profile = () => {
     try {
       if (activeSection === "posts") {
         const res = await getProfile({ userName }).unwrap();
+        console.log(res)
         setUserData(res.userData);
         setPosts(res.posts);
         setSavedPosts([]);
@@ -108,19 +113,24 @@ const Profile = () => {
                 </button>
               ) : (
                 <div className="flex items-center space-x-4">
-                  {userData.followers?.includes(userInfo.id) && <Link to={`/messages/${userData._id}`}>
-                  <div className="border border-gray-400 p-2 rounded-full">
-                    <FaRegEnvelope size={20}/>
-                  </div></Link>}
-                  
+                  {userData.followers?.includes(userInfo.id) && (
+                    <Link to={`/messages/${userData._id}`}>
+                      <div className="border border-gray-400 p-2 rounded-full">
+                        <FaRegEnvelope size={20} />
+                      </div>
+                    </Link>
+                  )}
+
                   <button
-                    onClick={() =>
-                      handleFollowing(
-                        userData.followers?.includes(userInfo.id)
-                          ? "unfollow"
-                          : "follow"
-                      )
-                    }
+                    onClick={() => {
+                      if (!userData?.followRequests?.includes(userInfo.id)) {
+                        handleFollowing(
+                          userData.followers?.includes(userInfo.id)
+                            ? "unfollow"
+                            : "follow"
+                        );
+                      }
+                    }}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                     className={`border border-gray-400 rounded-3xl px-3 py-1 font-semibold ${
@@ -128,6 +138,8 @@ const Profile = () => {
                         ? isHovered
                           ? "text-red-600"
                           : "text-gray-200 hover:text-red-600"
+                        : userData?.followRequests?.includes(userInfo.id)
+                        ? "text-white"
                         : "hover:text-gray-200 text-black  hover:decoration-stone-400  bg-white hover:bg-black"
                     }  `}
                   >
@@ -135,6 +147,8 @@ const Profile = () => {
                       ? isHovered
                         ? "Unfollow"
                         : "Following"
+                      : userData?.followRequests?.includes(userInfo.id)
+                      ? "Requested"
                       : "Follow"}
                   </button>
                 </div>
@@ -175,73 +189,84 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        <div className="py-4 px-2">
-          {userData?.garage?.length > 0 && (
-            <h1 className="text-3xl font-semibold">Garage</h1>
-          )}
-          <div className="flex flex-wrap my-3">
-            {userData?.garage?.map((bike) => (
-              <div key={bike._id} className="w-56 h-full p-2 mr-3  border border-gray-800">
-                <img className="w-full h-full" src={bike?.image?.url} alt="" />
+        {!userData?.privateAccount ||
+        userInfo.id === userData._id ||
+        userData.followers.includes(userInfo.id) ? (
+          <>
+            <div className="py-4 px-2">
+              {userData?.garage?.length > 0 && (
+                <h1 className="text-3xl font-semibold">Garage</h1>
+              )}
+              <div className="flex flex-wrap my-3">
+                {userData?.garage?.map((bike) => (
+                  <div
+                    key={bike._id}
+                    className="w-56 h-full p-2 mr-3  border border-gray-800"
+                  >
+                    <img
+                      className="w-full h-full"
+                      src={bike?.image?.url}
+                      alt=""
+                    />
 
-                <h1 className="text-xl text-center ">{bike.nickName}</h1>
-                <p className="text-sm  text-center text-gray-400">
-                  <span>{bike.year}</span> {bike.model}
-                </p>
+                    <h1 className="text-xl text-center ">{bike.nickName}</h1>
+                    <p className="text-sm  text-center text-gray-400">
+                      <span>{bike.year}</span> {bike.model}
+                    </p>
+                  </div>
+                ))}
+                {userName === userInfo.userName && (
+                  <div
+                    onClick={() => setOpenCreateGarageModal(true)}
+                    className="w-56 h-80 p-2 flex justify-center items-center shadow-lg border border-gray-800"
+                  >
+                    <MdAddToPhotos
+                      className="text-gray-600 hover:opacity-100 opacity-50"
+                      size={125}
+                    />
+                  </div>
+                )}
               </div>
-            ))}
-            {userName === userInfo.userName && (
-              <div
-                onClick={() => setOpenCreateGarageModal(true)}
-                className="w-56 h-80 p-2 flex justify-center items-center shadow-lg border border-gray-800"
-              >
-                <MdAddToPhotos
-                  className="text-gray-600 hover:opacity-100 opacity-50"
-                  size={125}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-        {/* POSTS */}
-        <div className="flex justify-between  mt-2 w-full  text-gray-400 border-b border-gray-600">
-          <span
-            onClick={() => setActiveSection("posts")}
-            className={`text-center px-20 py-4 hover:text-white hover:font-bold  ${
-              activeSection === "posts" && "border-b-2 border-white font-bold"
-            }`}
-          >
-            Posts
-          </span>
-          {userName === userInfo.userName && (
-            <span
-              onClick={() => setActiveSection("savedPosts")}
-              className={`text-center px-20 py-4 hover:text-white hover:font-bold  ${
-                activeSection === "savedPosts" &&
-                "border-b-2 border-white font-bold"
-              }`}
-            >
-              Saved
-            </span>
-          )}
-          <span className="text-center px-20 py-4 hover:text-white hover:font-bold active:border-b">
-            Clubs
-          </span>
-          <span className="text-center px-20 py-4 hover:text-white hover:font-bold active:border-b">
-            Events
-          </span>
-        </div>
-        {/* <div className="flex flex-wrap my-3 px-1">
-          {(activeSection === "posts" ? posts : savedPosts).map((post) => (
-            <div key={post._id} className="w-64 h-full p-1 border-gray-800">
-              <img src={post.media.url} alt="" />
             </div>
-          ))}
-        </div> */}
-        {activeSection === "posts" && <UserPosts posts={posts} />}
-        {activeSection === "savedPosts" && (
-          <UserSavedPosts savedPosts={savedPosts} />
+            {/* POSTS */}
+            <div className="flex justify-between  mt-2 w-full  text-gray-400 border-b border-gray-600">
+              <span
+                onClick={() => setActiveSection("posts")}
+                className={`text-center px-20 py-4 hover:text-white hover:font-bold  ${
+                  activeSection === "posts" &&
+                  "border-b-2 border-white font-bold"
+                }`}
+              >
+                Posts
+              </span>
+              {userName === userInfo.userName && (
+                <span
+                  onClick={() => setActiveSection("savedPosts")}
+                  className={`text-center px-20 py-4 hover:text-white hover:font-bold  ${
+                    activeSection === "savedPosts" &&
+                    "border-b-2 border-white font-bold"
+                  }`}
+                >
+                  Saved
+                </span>
+              )}
+              <span className="text-center px-20 py-4 hover:text-white hover:font-bold active:border-b">
+                Clubs
+              </span>
+              <span className="text-center px-20 py-4 hover:text-white hover:font-bold active:border-b">
+                Events
+              </span>
+            </div>
+
+            {activeSection === "posts" && <UserPosts posts={posts} />}
+            {activeSection === "savedPosts" && (
+              <UserSavedPosts savedPosts={savedPosts} />
+            )}
+          </>
+        ) : (
+          <PrivateComponent />
         )}
+
         <EditProfileModal
           open={openModel}
           onClose={() => setOpenModel(false)}

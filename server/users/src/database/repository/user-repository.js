@@ -89,6 +89,9 @@ class UserRepository {
     );
     return updatedUser;
   }
+  async followRequestUser(userName,userId){
+   return await UserModel.findOneAndUpdate({userName},{$addToSet:{followRequests:userId}},{new:true})
+  }
   async unfollowUser(userName, userId) {
     const updatedUser = await UserModel.findOneAndUpdate(
       { userName },
@@ -211,6 +214,10 @@ class UserRepository {
       { $set: { recentSearches: [] } },
       { new: true } // Returns the updated document
     );
+  }
+
+  async changePassword(userId,password,salt){
+    return await UserModel.findOneAndUpdate({_id:userId},{password,salt})
   }
 }
 

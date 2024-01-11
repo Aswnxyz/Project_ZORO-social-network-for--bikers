@@ -61,7 +61,6 @@ const CommentModal = ({
         text: comment,
       }).unwrap();
 
-      console.log(res);
       const newComment = {
         user: {
           profilePic: {
@@ -136,8 +135,6 @@ const CommentModal = ({
     try {
       const res = await getComments({ _id }).unwrap();
       setCommentList(res);
-      // console.log(res.length)
-      // setCommentCount(res.length);
     } catch (error) {
       console.log(error);
     }

@@ -14,7 +14,7 @@ class PostRepository {
 
   async getPostByUserId(user_id) {
 
-    return await PostModel.find({ userId: user_id }).sort({ createdAt: -1 });
+    return await PostModel.find({ userId: user_id }).sort({ createdAt: -1 }).lean();
 
   }
 
@@ -72,8 +72,8 @@ class PostRepository {
   }
   async dislikePost(post_id, user_id) {
     return await PostModel.findByIdAndUpdate(post_id, {
-      $pull: { likes: user_id },
-    });
+      $pull: { likes: user_id }
+    },{new:true});
   }
 
   async commentPost(postId, userId, text) {

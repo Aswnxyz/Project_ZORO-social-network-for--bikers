@@ -201,29 +201,43 @@ class UserService {
 
   async followUser({ userName, state }, userId) {
     if (state === "follow") {
-      const data = await this.repository.followUser(userName, userId);
-
       const followedUser = await this.repository.findUserByUsername(userName);
-      const payload = {
-        event: "NEW_NOTIFICATION",
-        data: {
-          type: "follow",
-          sender: userId,
-          recipient: followedUser._id,
-          content: `started following you.`,
-        },
-      };
-      
-      return {data,payload}
-    } else {
+      if (!followedUser.privateAccount) {
+        const data = await this.repository.followUser(userName, userId);
+        // const followedUser = await this.repository.findUserByUsername(userName);
+        const payload = {
+          event: "NEW_NOTIFICATION",
+          data: {
+            type: "follow",
+            sender: userId,
+            recipient: followedUser._id,
+            content: `started following you.`,
+          },
+        };
+
+        return { data, payload };
+      } else {
+        const data =await this.repository.followRequestUser(userName, userId);
+        const payload = {
+          event: "NEW_NOTIFICATION",
+          data: {
+            type: "followRequest",
+            sender: userId,
+            recipient: followedUser._id,
+            content: `requested to follow you.`,
+          },
+        };
+        return { data, payload };
+      }
+    } else if (state === "unfollow") {
       const data = await this.repository.unfollowUser(userName, userId);
       const followedUser = await this.repository.findUserByUsername(userName);
 
-     const payload={
-          event: "REMOVE_NOTFICATION",
-          data: { sender: userId, recipient: followedUser._id, type: "follow" },
-        }
-      return {data,payload}
+      const payload = {
+        event: "REMOVE_NOTFICATION",
+        data: { sender: userId, recipient: followedUser._id, type: "follow" },
+      };
+      return { data, payload };
     }
   }
 
@@ -282,16 +296,83 @@ class UserService {
     return result;
   }
 
-
-  async getUserDataWithMessages(userId,currentUserId){
+  async getUserDataWithMessages(userId, currentUserId) {
     const user = await this.repository.findUserById(userId);
-     const messages = await RPCRequest("MESSAGES_RPC", {
-       type: "GET_MESSAGES",
-       data: { senderId: currentUserId, receiverId : userId},
-     });
-     return {user,messages}
+    const messages = await RPCRequest("MESSAGES_RPC", {
+      type: "GET_MESSAGES",
+      data: { senderId: currentUserId, receiverId: userId },
+    });
+    return { user, messages };
   }
 
+  async changePassword({ currentPassword, newPassword }, userId) {
+    const user = await this.repository.findUserById(userId);
+
+    const validPassword = await ValidatePassword(
+      currentPassword,
+      user.password,
+      user.salt
+    );
+    if (!validPassword) throw new ValidationError("password does not match!");
+
+    const salt = await GenerateSalt();
+
+    const userPassword = await GeneratePassword(newPassword, salt);
+
+    return await this.repository.changePassword(userId, userPassword, salt);
+  }
+
+  async managePrivateAccount(userId) {
+    const userData = await this.repository.findUserById(userId);
+    userData.privateAccount = !userData.privateAccount;
+    return await userData.save();
+  }
+
+  async manageFollowRequest({ senderId, action }, userId) {
+    const userData = await this.repository.findUserById(userId);
+    if (action) {
+      userData.followers.push(senderId);
+      userData.followRequests = userData.followRequests.filter(
+        (requestId) => requestId.toString() !== senderId
+      );
+      const updatedUser = await userData.save();
+      const removePayload = {
+        event: "REMOVE_NOTFICATION",
+        data: {
+          sender: senderId,
+          recipient: userId,
+          type: "followRequest",
+        },
+      };
+      const payload = {
+        event: "NEW_NOTIFICATION",
+        data: {
+          type: "follow",
+          sender: senderId,
+          recipient: userId,
+          content: `started following you.`,
+        },
+      };
+
+      return { data: updatedUser, payload, removePayload };
+    } else {
+      console.log(userData.followRequests)
+      userData.followRequests = userData.followRequests.filter(
+        (requestId) => requestId.toString() !== senderId
+      );
+      const updatedUser = await userData.save();
+
+      const removePayload = {
+        event: "REMOVE_NOTFICATION",
+        data: {
+          sender: senderId,
+          recipient: userId,
+          type: "followRequest",
+        },
+      };
+      return {data:updatedUser,removePayload}
+    }
+  }
 
   // RPC Response
   async serveRPCRequest(payload) {

@@ -25,6 +25,7 @@ import LikedUsersList from "./Modals/LikedUsersList";
 const Post = ({
   user,
   media,
+  mediaUrl,
   des,
   likes,
   createdAt,
@@ -161,7 +162,7 @@ const Post = ({
         </div>
 
         <div className="border border-gray-800 rounded flex justify-center items-center">
-          <img src={media.url} alt="" />
+          <img src={mediaUrl} alt="" />
         </div>
         <div className="text-gray-400 flex justify-between pt-3 px-1">
           <div className="flex  items-center space-x-6">
@@ -197,7 +198,7 @@ const Post = ({
       </div>
       {openCommentModal && (
         <CommentModal
-          src={media.url}
+          src={mediaUrl}
           open={openCommentModal}
           onClose={() => setOpenCommentModal(false)}
           user={user}

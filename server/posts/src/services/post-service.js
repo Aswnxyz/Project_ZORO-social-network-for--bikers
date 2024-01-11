@@ -1,6 +1,34 @@
-const { NOTIFICATION_SERVICE } = require("../config");
+const {
+  NOTIFICATION_SERVICE,
+  ACCESS_KEY,
+  BUCKET_REGION,
+  SECRET_ACCESS_KEY,
+  BUCKET_NAME,
+} = require("../config");
 const { PostRepository } = require("../database");
 const { RPCRequest } = require("../utils");
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
+// const command = new GetObjectCommand(getObjectParams);
+// const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+
+const crypto = require("crypto");
+
+const randomImageName = (bytes = 32) =>
+  crypto.randomBytes(bytes).toString("hex");
+
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: ACCESS_KEY,
+    secretAccessKey: SECRET_ACCESS_KEY,
+  },
+  region: BUCKET_REGION,
+});
 
 const cloudinary = require("../utils/cloudinary");
 
@@ -9,19 +37,46 @@ class PostService {
     this.repository = new PostRepository();
   }
 
-  async createPost(postData, _id) {
-    const { des, media } = postData;
-    const result = await cloudinary.uploader.upload(media, { folder: "posts" });
+  async createPost(req, _id) {
+    const imageName = randomImageName();
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: imageName,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    };
+    const command = new PutObjectCommand(params);
+    await s3.send(command);
+    // return []
+    const { des } = req.body;
+    // const result = await cloudinary.uploader.upload(media, { folder: "posts" });
 
+    // const newPost = await this.repository.createPost(
+    //   { des, media: { public_id: result.public_id, url: result.secure_url } },
+    //   _id
+    // );
     const newPost = await this.repository.createPost(
-      { des, media: { public_id: result.public_id, url: result.secure_url } },
+      { des, media: imageName },
       _id
     );
     return newPost;
+    // return []
   }
 
   async getPosts({ page }) {
     const posts = await this.repository.getPosts(page);
+    for (const post of posts) {
+      const getObjectParams = {
+        Bucket: BUCKET_NAME,
+        Key: post.media,
+      };
+
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+      post.mediaUrl = url;
+    }
+    console.log(posts);
+    // await posts.save()
     posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     const userIds = posts.map((post) => post.userId);
@@ -55,7 +110,12 @@ class PostService {
       const data = await this.repository.dislikePost(post_id, user_id);
       const payload = {
         event: "REMOVE_NOTFICATION",
-        data: { sender: user_id, postId: post_id, type: "like" },
+        data: {
+          sender: user_id,
+          postId: post_id,
+          recipient: data.userId,
+          type: "like",
+        },
       };
       return { data, payload };
     }
@@ -120,6 +180,41 @@ class PostService {
     return { data, payload };
   }
 
+  async getUserPosts(data) {
+    const posts = await this.repository.getPostByUserId(data);
+
+    for (const post of posts) {
+      console.log(post);
+      const getObjectParams = {
+        Bucket: BUCKET_NAME,
+        Key: post.media,
+      };
+
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+      console.log(url);
+      post.mediaUrl = url;
+    }
+    return posts;
+  }
+  async getPostsWithId(data) {
+    const posts = await this.repository.getPostsWithId(data);
+
+    for (const post of posts) {
+      console.log(post);
+      const getObjectParams = {
+        Bucket: BUCKET_NAME,
+        Key: post.media,
+      };
+
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+      console.log(url);
+      post.mediaUrl = url;
+    }
+    return posts;
+  }
+
   // RPC Response
   async serveRPCRequest(payload) {
     const { type, data } = payload;
@@ -128,13 +223,13 @@ class PostService {
         return this.repository.getAllPosts(data);
         break;
       case "GET_USER_POSTS":
-        return this.repository.getPostByUserId(data);
+        return this.getUserPosts(data);
         break;
       case "HANDLE_BLOCK":
         return this.repository.handleBlock(data);
         break;
       case "GET_POST_WITH_ID":
-        return this.repository.getPostsWithId(data);
+        return this.getPostsWithId(data);
         break;
       case "GET_COMMENTS_WITH_ID":
         return this.repository.getCommentsWithId(data);

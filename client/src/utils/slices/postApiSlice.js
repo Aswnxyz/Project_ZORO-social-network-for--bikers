@@ -8,6 +8,9 @@ export const postApiSlice = apiSlice.injectEndpoints({
         url: `${POST_URL}/createPost`,
         method: "POST",
         body: data,
+        // headers: {
+        //   "Content-Type": "multipart/form-data",
+        // },
       }),
     }),
     getPosts: builder.mutation({

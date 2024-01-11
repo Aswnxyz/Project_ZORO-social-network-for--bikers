@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { useSelector } from "react-redux";
@@ -10,10 +10,9 @@ import { useGetRecentChattedUsersMutation } from "../../utils/slices/messageApiS
 import { ImSpinner2 } from "react-icons/im";
 import { LuDot } from "react-icons/lu";
 import { MdEmojiEmotions } from "react-icons/md";
-// import socket from '../../utils/messageSocket'
 
 const Messages = () => {
-  const [socket ,setSocket ]= useState(null)
+  const [socket, setSocket] = useState(null);
   const { userInfo } = useSelector((state) => state.auth);
   const { userId } = useParams();
   const [getUserData, { isLoading }] = useGetUserDataMutation();
@@ -68,7 +67,6 @@ const Messages = () => {
   };
 
   const sendMessage = () => {
-    console.log('message sended')
     if (socket && inputMessage.trim() !== "") {
       const messageData = {
         sender: userInfo.id,
@@ -116,32 +114,29 @@ const Messages = () => {
     setInputMessage(inputMessage + emoji);
   };
 
-  // socket.on("message", (message) => {
-  //   console.log("onmessage");
-  //   console.log(message);
-  //   if (message.sender === userData?._id) {
-  //     setMessages((prevMessages) => [...prevMessages, message.text]);
-  //   }
+  const handleReadMessage = async (userId) => {
+    try {
+      socket.emit("readMessage", { sender: userId, receiver: userInfo.id });
+      const updatedRecentChattedUsers = recentChattedUsers.map((user) => {
+        if (user["0"]._id === userId) {
+          return {
+            ...user,
+            lastMessage: {
+              ...user.lastMessage,
+              read: true,
+            },
+          };
+        }
+        return user;
+      });
 
-  //   // Update user data with the latest message
-  //   const updatedRecentChattedUsers = recentChattedUsers.map((user) => {
-  //     if (user["0"]._id === userId) {
-  //       return {
-  //         ...user,
-  //         lastMessage: message.text,
-  //       };
-  //     }
-  //     return user;
-  //   });
-
-  //   setRecentChattedUsers(updatedRecentChattedUsers);
-  // });
-
- // Empty dependency array to run the effect only once
+      setRecentChattedUsers(updatedRecentChattedUsers);
+    } catch (error) {
+      console.log(error.data);
+    }
+  };
 
   useEffect(() => {
-    console.log("issue 1");
-
     const newSocket = io("http://localhost:8004");
 
     newSocket.on("connected", () => console.log("connected to message socket"));
@@ -152,10 +147,17 @@ const Messages = () => {
       if (message.sender === userData?._id) {
         setMessages((prevMessages) => [...prevMessages, message.text]);
       }
+      // if (userId) {
+      //       socket.emit("readMessage",{  
+      //         sender: userId,
+      //         receiver: userInfo.id,
+      //       });
+
+      // }
 
       // Update user data with the latest message
       const updatedRecentChattedUsers = recentChattedUsers.map((user) => {
-        if (user["0"]._id === userId) {
+        if (user["0"]._id === message.sender) {
           return {
             ...user,
             lastMessage: message.text,
@@ -167,14 +169,29 @@ const Messages = () => {
       setRecentChattedUsers(updatedRecentChattedUsers);
     });
 
+    newSocket.on("messageSeened", (userId) => {
+      console.log("seened");
+      if (userData?._id === userId) {
+        const updatedMessages = messages.map((message) => {
+          if (!message.read) {
+            return {
+              ...message,
+              read: true,
+            };
+          }
+          return message;
+        });
+
+        setMessages(updatedMessages);
+      }
+    });
+
     return () => {
       newSocket.disconnect();
     };
   }, [userInfo.id, userData, userId, recentChattedUsers]);
 
   useEffect(() => {
-    console.log("issue 2");
-
     if (userId) {
       fetchData(userId);
     }
@@ -182,8 +199,6 @@ const Messages = () => {
   }, [userId]);
 
   useEffect(() => {
-    console.log("issue 3");
-
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
         messagesContainerRef.current.scrollHeight;
@@ -196,7 +211,11 @@ const Messages = () => {
           <h1 className="text-xl mb-4 text-white font-semibold">Messages</h1>
           <ul className="mb-2">
             {recentChattedUsers.map((user) => (
-              <Link key={user["0"]._id} to={`/messages/${user["0"]._id}`}>
+              <Link
+                onClick={() => handleReadMessage(user["0"]._id)}
+                key={user["0"]._id}
+                to={`/messages/${user["0"]._id}`}
+              >
                 <li key={user["0"]._id} className="">
                   <div className="flex items-center  p-2 ">
                     <img
@@ -213,7 +232,14 @@ const Messages = () => {
                         <p className="text-white ">{user["0"].fullName}</p>
 
                         <div className="flex">
-                          <p className="text-sm dark:text-gray-400 font-extralight overflow-hidden overflow-ellipsis">
+                          <p
+                            className={`text-sm  ${
+                              user?.lastMessage?.sender !== userInfo.id &&
+                              !user?.lastMessage?.read
+                                ? "text-white font-bold"
+                                : "text-gray-400 font-extralight"
+                            }  overflow-hidden overflow-ellipsis`}
+                          >
                             {user?.lastMessage?.sender === userInfo.id
                               ? "You:" + user.lastMessage.content
                               : user?.lastMessage?.content}
@@ -300,6 +326,11 @@ const Messages = () => {
                     >
                       {message.content}
                     </div>
+                    {messages.length - 1 === index &&
+                    message.sender === userInfo.id &&
+                    message.read ? (
+                      <p className="text-sm text-gray-400 mr-4">Seen</p>
+                    ) : null}
                   </div>
                 ))}
               </div>
