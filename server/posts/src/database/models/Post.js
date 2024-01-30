@@ -18,6 +18,8 @@ const PostSchema = new Schema(
     reported: [{ reason: { type: String, required: true }, userName: String }],
     likes: [Schema.Types.ObjectId],
     isActive: { type: Boolean, default: true },
+    isCommunityPost:{type:Boolean,default:false},
+    communityId:{type:Schema.Types.ObjectId}
   },
   { timestamps: true }
 );

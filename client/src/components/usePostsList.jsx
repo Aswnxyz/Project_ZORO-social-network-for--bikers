@@ -25,9 +25,9 @@ const usePostsList = (pageNumber) => {
         // Filter out posts that don't meet the conditions
         const filteredPosts = res.filter(
           (post) =>
-            post.user.followers.includes(userInfo.id) ||
-            !post.user.privateAccount ||
-            post.user._id === userInfo.id
+            post?.user?.followers.includes(userInfo.id) ||
+            !post?.user?.privateAccount ||
+            post?.user?._id === userInfo.id
         );
 
         // Concatenate the filtered posts with the previous posts

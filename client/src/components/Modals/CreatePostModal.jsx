@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 const ASPECT_RATIO = 4 / 5;
 const MIN_DIMENTION = 300;
 
-const CreatPostModal = ({ open, onClose }) => {
+const CreatPostModal = ({ open, onClose, communityId, addNewPost }) => {
   const { userInfo } = useSelector((state) => state.auth);
   const imgRef = useRef(null);
   const previewCanvasRef = useRef(null);
@@ -73,16 +73,18 @@ const CreatPostModal = ({ open, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      console.log(croppedImage)
+      console.log(croppedImage);
       const formData = new FormData();
       formData.append("image", croppedImage);
-      formData.append("des",caption)
-    
-      // const res = await createPost({
-      //   des: caption,
-      //   media: croppedImage,
-      // }).unwrap();
+      formData.append("des", caption);
+      if (communityId) {
+        formData.append("communityId", communityId);
+      }
+
       const res = await createPost(formData).unwrap();
+      if(communityId){
+        addNewPost(res)
+      }
       console.log(res);
       setCaption("");
       setCroppedImage("");
@@ -107,7 +109,6 @@ const CreatPostModal = ({ open, onClose }) => {
 
     return new Blob([u8arr], { type: mime });
   }
-
 
   if (!open) return null;
   return (
@@ -153,8 +154,6 @@ const CreatPostModal = ({ open, onClose }) => {
                     previewCanvasRef.current.style.display = "block";
 
                     const blob = dataURLtoBlob(dataUrl);
-
-                    
 
                     // Create a File from the Blob
                     const file = new File([blob], "cropped_image.jpg", {

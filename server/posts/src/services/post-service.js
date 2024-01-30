@@ -41,7 +41,7 @@ class PostService {
     const imageName = randomImageName();
     const params = {
       Bucket: BUCKET_NAME,
-      Key: imageName,
+      Key: `posts/${imageName}`,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
     };
@@ -55,27 +55,50 @@ class PostService {
     //   { des, media: { public_id: result.public_id, url: result.secure_url } },
     //   _id
     // );
-    const newPost = await this.repository.createPost(
-      { des, media: imageName },
-      _id
-    );
+    const newPostData = { des, media: imageName, userId: _id };
+
+    // Check if communityId is present in req.body
+    if (req.body.communityId) {
+      newPostData.isCommunityPost = true;
+      newPostData.communityId = req.body.communityId;
+    }
+
+    const newPost = await this.repository.createPost(newPostData);
     return newPost;
-    // return []
   }
 
   async getPosts({ page }) {
     const posts = await this.repository.getPosts(page);
+    const communityPosts = posts.filter((post) => post.isCommunityPost);
+    if (communityPosts.length > 0) {
+      // Extract communityIds from community posts
+      const communityIds = communityPosts.map((post) => post.communityId);
+
+      // Fetch community data based on communityIds
+      const communities = await RPCRequest("COMMUNITY_RPC", {
+        type: "GET_COMMUNITIES_WITH_ID",
+        data: communityIds,
+      });
+
+      // Combine community data with community posts
+      posts.forEach((post) => {
+        const community = communities.find(
+          (comm) => comm?._id.toString() === post?.communityId?.toString()
+        );
+        post.community = community; // Assuming you want to add community data to each community post
+      });
+    }
+
     for (const post of posts) {
       const getObjectParams = {
         Bucket: BUCKET_NAME,
-        Key: post.media,
+        Key: `posts/${post.media}`,
       };
 
       const command = new GetObjectCommand(getObjectParams);
       const url = await getSignedUrl(s3, command, { expiresIn: 300 });
       post.mediaUrl = url;
     }
-    console.log(posts);
     // await posts.save()
     posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -184,15 +207,13 @@ class PostService {
     const posts = await this.repository.getPostByUserId(data);
 
     for (const post of posts) {
-      console.log(post);
       const getObjectParams = {
         Bucket: BUCKET_NAME,
-        Key: post.media,
+        Key: `posts/${post.media}`,
       };
 
       const command = new GetObjectCommand(getObjectParams);
       const url = await getSignedUrl(s3, command, { expiresIn: 300 });
-      console.log(url);
       post.mediaUrl = url;
     }
     return posts;
@@ -201,26 +222,82 @@ class PostService {
     const posts = await this.repository.getPostsWithId(data);
 
     for (const post of posts) {
-      console.log(post);
       const getObjectParams = {
         Bucket: BUCKET_NAME,
-        Key: post.media,
+        Key: `posts/${post.media}`,
       };
 
       const command = new GetObjectCommand(getObjectParams);
       const url = await getSignedUrl(s3, command, { expiresIn: 300 });
-      console.log(url);
       post.mediaUrl = url;
     }
     return posts;
   }
 
+  async getCommuntiyPosts(data) {
+    const posts = await this.repository.getCommunityPostsById(data);
+
+    for (const post of posts) {
+      const getObjectParams = {
+        Bucket: BUCKET_NAME,
+        Key: `posts/${post.media}`,
+      };
+
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+      post.mediaUrl = url;
+    }
+    posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const userIds = posts.map((post) => post.userId);
+    const users = await RPCRequest("USERS_RPC", {
+      type: "GET_USERS_WITH_ID",
+      data: userIds,
+    });
+
+    const commentsPromises = posts.map((post) =>
+      this.repository.getCommentsCountWithId(post._id)
+    );
+
+    const commentsArray = await Promise.all(commentsPromises);
+
+    const combinedData = posts.map((post, index) => {
+      const user = users.find(
+        (user) => user._id.toString() === post.userId.toString()
+      );
+      const totalComments = commentsArray[index];
+
+      return { ...post, user, totalComments };
+    });
+
+    return combinedData;
+  }
+
+  async getAdminPosts(data) {
+    const { posts, totalCount, totalPages } = await this.repository.getAllPosts(
+      data
+    );
+
+    for (const post of posts) {
+      const getObjectParams = {
+        Bucket: BUCKET_NAME,
+        Key: `posts/${post.media}`,
+      };
+
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+      post.mediaUrl = url;
+    }
+    return { posts, totalCount, totalPages };
+  }
+
+  
   // RPC Response
   async serveRPCRequest(payload) {
     const { type, data } = payload;
     switch (type) {
       case "GET_POSTS":
-        return this.repository.getAllPosts(data);
+        return this.getAdminPosts(data);
         break;
       case "GET_USER_POSTS":
         return this.getUserPosts(data);
@@ -233,6 +310,9 @@ class PostService {
         break;
       case "GET_COMMENTS_WITH_ID":
         return this.repository.getCommentsWithId(data);
+        break;
+      case "GET_COMMUNITY_POSTS_BY_ID":
+        return this.getCommuntiyPosts(data);
       default:
         break;
     }

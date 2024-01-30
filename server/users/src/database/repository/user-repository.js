@@ -19,7 +19,7 @@ class UserRepository {
   }
 
   async findUser({ email }) {
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await UserModel.findOne({ email },{password:0});
     return existingUser;
   }
   async findUserWithEmailOrUserName({ email, userName }) {
@@ -34,7 +34,7 @@ class UserRepository {
   }
 
   async findUserById(id) {
-    return await UserModel.findById(id);
+    return await UserModel.findById(id,{password:0,salt:0});
   }
 
   async findOtp(id) {
@@ -49,7 +49,7 @@ class UserRepository {
   }
 
   async getUsers() {
-    const usersData = await UserModel.find({});
+    const usersData = await UserModel.find({},{password:0,salt:0});
     return usersData;
   }
 
@@ -74,7 +74,7 @@ class UserRepository {
   }
 
   async getUsersWithId(userIds) {
-    return await UserModel.find({ _id: { $in: userIds } }).lean();
+    return await UserModel.find({ _id: { $in: userIds } },{password:0,salt:0}).lean();
   }
 
   async followUser(userName, userId) {
@@ -218,6 +218,10 @@ class UserRepository {
 
   async changePassword(userId,password,salt){
     return await UserModel.findOneAndUpdate({_id:userId},{password,salt})
+  }
+  async getEventInvites(userId){
+    const userData = await this.findUserById(userId);
+    return userData.eventInvites
   }
 }
 

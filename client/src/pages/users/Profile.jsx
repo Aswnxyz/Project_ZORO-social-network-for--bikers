@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { IoLocationOutline } from "react-icons/io5";
 import { FaRegEnvelope } from "react-icons/fa6";
+import { CgSpinnerTwoAlt } from "react-icons/cg";
+
 import {
   useFollowUserMutation,
   useGetProfileMutation,
@@ -15,10 +17,12 @@ import UserPosts from "../../components/UserPosts";
 import UserSavedPosts from "../../components/UserSavedPosts";
 import CreateGarageModal from "../../components/Modals/CreateGarageModal";
 import PrivateComponent from "../../components/PrivateComponent";
+import ErrorPage from "../../components/ErrorPage";
 const Profile = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [error,setError]= useState(false)
   const [userData, setUserData] = useState({});
-  const [getProfile] = useGetProfileMutation();
+  const [getProfile,{isLoading}] = useGetProfileMutation();
   const [getSavedPosts] = useGetSavedPostMutation();
   const [openModel, setOpenModel] = useState(false);
   const [openFollowersModal, setopenFollowersModal] = useState("");
@@ -56,7 +60,6 @@ const Profile = () => {
     try {
       if (activeSection === "posts") {
         const res = await getProfile({ userName }).unwrap();
-        console.log(res)
         setUserData(res.userData);
         setPosts(res.posts);
         setSavedPosts([]);
@@ -67,13 +70,14 @@ const Profile = () => {
       }
     } catch (error) {
       console.log(error);
+      setError(true)
     }
   };
 
   useEffect(() => {
     fetchData();
   }, [userName, activeSection]);
-  return (
+  return isLoading ?<div className="flex justify-center items-center h-screen"> <CgSpinnerTwoAlt className="animate-spin" size={100} color="gray"/></div>:error?<ErrorPage/> : (
     <>
       <div className="text-white h-full px-20 mt-10">
         <div className="relative h-[24rem]  bg-gradient-to-r from-black ">
@@ -229,7 +233,7 @@ const Profile = () => {
               </div>
             </div>
             {/* POSTS */}
-            <div className="flex justify-between  mt-2 w-full  text-gray-400 border-b border-gray-600">
+            <div className="flex justify-evenly  mt-2 w-full  text-gray-400 border-b border-gray-600">
               <span
                 onClick={() => setActiveSection("posts")}
                 className={`text-center px-20 py-4 hover:text-white hover:font-bold  ${
@@ -250,12 +254,12 @@ const Profile = () => {
                   Saved
                 </span>
               )}
-              <span className="text-center px-20 py-4 hover:text-white hover:font-bold active:border-b">
+              {/* <span className="text-center px-20 py-4 hover:text-white hover:font-bold active:border-b">
                 Clubs
               </span>
               <span className="text-center px-20 py-4 hover:text-white hover:font-bold active:border-b">
                 Events
-              </span>
+              </span> */}
             </div>
 
             {activeSection === "posts" && <UserPosts posts={posts} />}
@@ -293,6 +297,7 @@ const Profile = () => {
             updateGarage={(newMotor) => updateGarage(newMotor)}
           />
         )}
+       
       </div>
     </>
   );

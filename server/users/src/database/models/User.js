@@ -58,7 +58,8 @@ const UserSchema = new Schema(
     country:{type:String},
     gender:{type:String},
     dataOfBirth:{type:Date},
-    privateAccount:{type:Boolean}
+    privateAccount:{type:Boolean},
+    
 
   },
   { timestamps: true }

@@ -21,7 +21,7 @@ const startServer = async () => {
 
   const channel = await CreateChannel();
 
-  await expressApp(app, channel, io);
+  await expressApp(app, channel ,io);
 
   //watch all errors and formate and report to logger
   app.use((error, req, res, next) => {

@@ -3,7 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { message } = require("./api");
 
-module.exports = async (app, channel, io) => {
+module.exports = async (app, channel,io) => {
   app.use(
     cors({
       origin: "http://localhost:5173",
@@ -19,5 +19,5 @@ module.exports = async (app, channel, io) => {
   app.use(express.static(__dirname + "/public"));
 
   //api
-  message(app, channel, io);
+  message(app, channel,io);
 };

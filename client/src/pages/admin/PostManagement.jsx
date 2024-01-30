@@ -77,7 +77,7 @@ const PostManagement = () => {
                 Post ID
               </th>
               <th scope="col" class="px-6 py-3">
-                User ID
+                Des
               </th>
               <th scope="col" class="px-6 py-3">
                 Created
@@ -104,7 +104,7 @@ const PostManagement = () => {
                   >
                     {post?._id}
                   </th>
-                  <td class="px-6 py-4">{post?.userId}</td>
+                  <td class="px-6 py-4">{post?.des}</td>
                   <td class="px-6 py-4">
                     {new Date(post?.createdAt).toLocaleString()}
                   </td>

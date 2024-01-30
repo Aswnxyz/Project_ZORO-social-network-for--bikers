@@ -24,9 +24,11 @@ import LikedUsersList from "./Modals/LikedUsersList";
 
 const Post = ({
   user,
+  community,
   media,
   mediaUrl,
   des,
+  isCommunityPost,
   likes,
   createdAt,
   _id,
@@ -126,33 +128,80 @@ const Post = ({
       <div className=" px-10 mb-4 rounded bg-gray-50 dark:bg-black ">
         <div className="flex justify-between items-center">
           <div className="flex my-4">
-            <img
-              className="h-10 rounded-full"
-              src={
-                user.profilePic
-                  ? user.profilePic?.url
-                  : "/img/profile_icon.jpeg"
-              }
-              alt=""
-            />
-            <div className="px-4">
-              <Link to={`/${user.userName}`}>
-                {" "}
-                <div className="flex  text-center">
-                  <p className="text-lg text-white font-semibold">
-                    {user.fullName}
-                  </p>
-                  <span className="px-2 dark:text-gray-500">
-                    @{user.userName}
-                  </span>{" "}
-                  <LuDot className="pr-2 text-gray-400" size={28} />
-                  <span className="dark:text-gray-500">
-                    {formatRelativeTime(createdAt)}
-                  </span>
+            {isCommunityPost ? (
+              <div className="flex">
+                <div className=" relative  h-fit">
+                  <img
+                    className=" h-10 w-10 rounded-xl"
+                    src={
+                      community.image
+                        ? community.image?.url
+                        : "/img/profile_icon.jpeg"
+                    }
+                    alt=""
+                  />
+                  <img
+                    className="h-6 border border-black rounded-full absolute -bottom-1 right-0"
+                    src={
+                      user.profilePic
+                        ? user.profilePic?.url
+                        : "/img/profile_icon.jpeg"
+                    }
+                    alt=""
+                  />
                 </div>
-              </Link>
-              <p className="text-white">{desc}</p>
-            </div>
+                <div className="px-4 text-white  ">
+                  {" "}
+                  <div className="flex">
+                    <p className="text-lg text-white font-semibold">
+                      {community.name}
+                    </p>
+                    {/* <span className="mx-2 text-sm text-gray-400"> by </span> */}
+                    <div className="flex">
+                      <span className="px-2 dark:text-gray-500">
+                        @{user.userName}
+                      </span>{" "}
+                      <LuDot className="pr-2 text-gray-400" size={28} />
+                      <span className="dark:text-gray-500">
+                        {formatRelativeTime(createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-white">{desc}</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <img
+                  className="h-10 rounded-full"
+                  src={
+                    user?.profilePic
+                      ? user?.profilePic?.url
+                      : "/img/profile_icon.jpeg"
+                  }
+                  alt=""
+                />
+
+                <div className="px-4">
+                  <Link to={`/${user?.userName}`}>
+                    {" "}
+                    <div className="flex  text-center">
+                      <p className="text-lg text-white font-semibold">
+                        {user?.fullName}
+                      </p>
+                      <span className="px-2 dark:text-gray-500">
+                        @{user?.userName}
+                      </span>{" "}
+                      <LuDot className="pr-2 text-gray-400" size={28} />
+                      <span className="dark:text-gray-500">
+                        {formatRelativeTime(createdAt)}
+                      </span>
+                    </div>
+                  </Link>
+                  <p className="text-white">{desc}</p>
+                </div>
+              </>
+            )}
           </div>
           <BsThreeDots
             onClick={() => SetOptionsModal(true)}
@@ -179,7 +228,7 @@ const Post = ({
             </span>
             {likedUsers.length > 0 && (
               <span onClick={() => setLikedUsersList(true)}>
-                {formatNumber(likedUsers.length)}
+                {formatNumber(likedUsers?.length)}
               </span>
             )}
 

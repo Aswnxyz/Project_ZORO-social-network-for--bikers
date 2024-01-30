@@ -4,6 +4,7 @@ import { LuDot } from "react-icons/lu";
 import { Link } from "react-router-dom";
 
 const AdminPostDetail = ({ post, onClose }) => {
+  console.log(post)
  
 
   return (
@@ -17,7 +18,7 @@ const AdminPostDetail = ({ post, onClose }) => {
       >
         <div className="flex justify-between">
           <div className="">
-            <img className="h-[40rem]" src={post.media.url} alt="" />
+            <img className="h-[40rem]" src={post.mediaUrl} alt="" />
           </div>
           <div className="text-white">
             <div className=" top-0 right-0 relative">

@@ -26,7 +26,16 @@ import YourAccount from "./components/YourAccount";
 import AccountInformation from "./components/AccountInformation";
 import ChangeYourPassword from "./components/ChangeYourPassword";
 import AccountPrivacy from "./components/AccountPrivacy";
-
+import ChatProvider from "./Context/ChatProvider";
+import Clubs from "./pages/users/Clubs";
+import YourCommunities from "./components/YourCommunities";
+import ClubBox from "./components/ClubBox";
+import DiscoverCommunities from "./components/DiscoverCommunities";
+import Events from "./pages/users/Events";
+import EventsHome from "./components/EventsHome";
+import EventBox from "./components/EventBox";
+import YourEvents from "./components/YourEvents";
+import VideoCall from "./pages/users/VideoCall";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -68,9 +77,43 @@ const router = createBrowserRouter([
             path: "/messages",
             element: <Messages />,
           },
+          // {
+          //   path: "/messages/:userId",
+          //   element: <Messages />,
+          // },
           {
-            path: "/messages/:userId",
-            element: <Messages />,
+            path: "/clubs",
+            element: <Clubs />,
+            children: [
+              {
+                path: "joins",
+                element: <YourCommunities />,
+              },
+              {
+                path: ":communityId",
+                element: <ClubBox />,
+              },
+              {
+                path: "discover",
+                element: <DiscoverCommunities />,
+              },
+            ],
+          },
+          {
+            path: "/events",
+            element: <Events />,
+            children: [
+              { path: "", element: <EventsHome /> },
+              { path: ":eventId", element: <EventBox /> },
+              {path:"going",element:<YourEvents/>},
+              {path:"interested",element:<YourEvents/>},
+              {path:"invites",element:<YourEvents/>},
+              {path:"hosting",element:<YourEvents/>},
+            ],
+          },
+          {
+            path:"/call/:roomId",
+            element:<VideoCall/>
           },
           {
             path: "/settings",
@@ -90,7 +133,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "privacy-setting",
-                element:<AccountPrivacy/>
+                element: <AccountPrivacy />,
               },
             ],
           },
@@ -131,7 +174,9 @@ const App = () => {
   return (
     <GoogleOAuthProvider clientId="269741526603-9fhnome52gfetuagivuf2amaf8u1emar.apps.googleusercontent.com">
       <Provider store={store}>
-        <RouterProvider router={router} />
+        <ChatProvider>
+          <RouterProvider router={router} />
+        </ChatProvider>
       </Provider>
     </GoogleOAuthProvider>
   );

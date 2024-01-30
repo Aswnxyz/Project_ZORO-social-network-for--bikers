@@ -2,24 +2,20 @@ const { PostModel, CommentModel } = require("../models");
 const { findByIdAndDelete } = require("../models/Post");
 
 class PostRepository {
-  async createPost({ des, media }, _id) {
-    const post = new PostModel({
-      userId: _id,
-      des,
-      media,
-    });
+  async createPost(newPostData) {
+    const post = new PostModel(newPostData);
     const postData = await post.save();
     return postData;
   }
 
   async getPostByUserId(user_id) {
-
-    return await PostModel.find({ userId: user_id }).sort({ createdAt: -1 }).lean();
-
+    return await PostModel.find({ userId: user_id })
+      .sort({ createdAt: -1 })
+      .lean();
   }
 
   async getPosts(page) {
-        const startIndex = (page - 1) * 5;
+    const startIndex = (page - 1) * 5;
 
     return await PostModel.find({ isActive: true })
       .sort({ createdAt: -1 })
@@ -50,30 +46,34 @@ class PostRepository {
   }
 
   async LikePost(post_id, user_id) {
-    const data= await PostModel.findByIdAndUpdate(
+    const data = await PostModel.findByIdAndUpdate(
       post_id,
       { $addToSet: { likes: user_id } },
       { new: true }
     );
-    const post = await PostModel.findById(post_id)
-     const payload = {
-       event: "NEW_NOTIFICATION",
-       data: {
-         type: "like",
-         sender: user_id,
-         recipient: post.userId,
-         content: `liked your photo.`,
-         contentDetails: {
-           postId: post_id,
-         },
-       },
-     };
-     return {data,payload}
+    const post = await PostModel.findById(post_id);
+    const payload = {
+      event: "NEW_NOTIFICATION",
+      data: {
+        type: "like",
+        sender: user_id,
+        recipient: post.userId,
+        content: `liked your photo.`,
+        contentDetails: {
+          postId: post_id,
+        },
+      },
+    };
+    return { data, payload };
   }
   async dislikePost(post_id, user_id) {
-    return await PostModel.findByIdAndUpdate(post_id, {
-      $pull: { likes: user_id }
-    },{new:true});
+    return await PostModel.findByIdAndUpdate(
+      post_id,
+      {
+        $pull: { likes: user_id },
+      },
+      { new: true }
+    );
   }
 
   async commentPost(postId, userId, text) {
@@ -125,8 +125,8 @@ class PostRepository {
   async getPostsWithId(postIds) {
     return await PostModel.find({ _id: { $in: postIds } }).lean();
   }
-  async getCommentsWithId(commentIds){
-    return await CommentModel.find({_id:{$in:commentIds}}).lean();
+  async getCommentsWithId(commentIds) {
+    return await CommentModel.find({ _id: { $in: commentIds } }).lean();
   }
 
   async reportPost(userName, reason, postId) {
@@ -138,19 +138,27 @@ class PostRepository {
   }
 
   async deletePost({ postId }) {
-    return await PostModel.findByIdAndDelete({ _id: postId },{new:true});
+    return await PostModel.findByIdAndDelete({ _id: postId }, { new: true });
   }
-  async editPost ({postId,des}){
-    return await PostModel.findOneAndUpdate({_id:postId},{des:des},{new:true})
+  async editPost({ postId, des }) {
+    return await PostModel.findOneAndUpdate(
+      { _id: postId },
+      { des: des },
+      { new: true }
+    );
   }
 
-  async deleteComment(commentId){
-    return await CommentModel.findByIdAndDelete(commentId)
+  async deleteComment(commentId) {
+    return await CommentModel.findByIdAndDelete(commentId);
   }
-  async getPostWithId(postId){
-    return await PostModel.findById(postId)
+  async getPostWithId(postId) {
+    return await PostModel.findById(postId);
+  }
+  async getCommunityPostsById(communityId) {
+    return await PostModel.find({ communityId }, { isCommunityPost: 0 })
+      .sort({ createdAt: -1 })
+      .lean();
   }
 }
 
 module.exports = PostRepository;
-

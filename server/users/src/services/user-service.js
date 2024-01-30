@@ -76,6 +76,9 @@ class UserService {
       userName: existingUser.userName,
       pic: existingUser.profilePic?.url,
       fullName: existingUser.fullName,
+      followers:existingUser.followers,
+      following:existingUser.following,
+      savedPosts:existingUser.savedPosts
     };
   }
 
@@ -117,6 +120,9 @@ class UserService {
       userName: existingUser.userName,
       pic: existingUser.profilePic?.url,
       fullName: existingUser.fullName,
+      followers: existingUser.followers,
+      following: existingUser.following,
+      savedPosts: existingUser.savedPosts,
     };
   }
   async googleAuth(decoded, res) {
@@ -155,6 +161,9 @@ class UserService {
       userName: existingUser.userName,
       pic: existingUser.profilePic?.url,
       fullName: existingUser.fullName,
+      followers: existingUser.followers,
+      following: existingUser.following,
+      savedPosts: existingUser.savedPosts,
     };
   }
 
@@ -217,7 +226,7 @@ class UserService {
 
         return { data, payload };
       } else {
-        const data =await this.repository.followRequestUser(userName, userId);
+        const data = await this.repository.followRequestUser(userName, userId);
         const payload = {
           event: "NEW_NOTIFICATION",
           data: {
@@ -356,7 +365,7 @@ class UserService {
 
       return { data: updatedUser, payload, removePayload };
     } else {
-      console.log(userData.followRequests)
+      console.log(userData.followRequests);
       userData.followRequests = userData.followRequests.filter(
         (requestId) => requestId.toString() !== senderId
       );
@@ -370,7 +379,7 @@ class UserService {
           type: "followRequest",
         },
       };
-      return {data:updatedUser,removePayload}
+      return { data: updatedUser, removePayload };
     }
   }
 
@@ -386,6 +395,13 @@ class UserService {
         break;
       case "GET_USERS_WITH_ID":
         return this.repository.getUsersWithId(data);
+        break;
+      case "GET_USER":
+        return this.repository.findUserById(data);
+        break;
+        case "GET_EVENT_iNVITES":
+          return this.repository.getEventInvites(data)
+          break;
       default:
         break;
     }
