@@ -13,7 +13,7 @@ function Home() {
 
   const [getUser] = useGetCurrentUserMutation();
 
-  const { posts, hasMore, loading, error } = usePostsList(pageNumber);
+  const { posts,setPosts, hasMore, loading, error } = usePostsList(pageNumber);
   const observer = useRef();
   const lastBookElementRef = useCallback(
     (node) => {
@@ -31,7 +31,6 @@ function Home() {
 
   const fetchData = async () => {
     try {
-     
       const userData = await getUser().unwrap();
       setUserData(userData);
     } catch (error) {
@@ -60,6 +59,7 @@ function Home() {
                   <Post
                     {...post}
                     savedPosts={userData?.savedPosts}
+                    setPosts={setPosts}
                     // key={post._id}
                   />
                 </div>
@@ -70,6 +70,7 @@ function Home() {
                   <Post
                     {...post}
                     savedPosts={userData?.savedPosts}
+                    setPosts={setPosts}
                     // key={post._id}
                   />
                 </div>
@@ -78,7 +79,7 @@ function Home() {
           })}
           {loading && (
             <div className="flex justify-center items-center">
-              <ImSpinner3 className="animate-spin" size={32} color="white"/>
+              <ImSpinner3 className="animate-spin" size={32} color="white" />
             </div>
           )}
         </div>

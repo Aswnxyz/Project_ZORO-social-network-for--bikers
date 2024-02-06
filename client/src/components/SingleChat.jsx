@@ -41,7 +41,7 @@ const SingleChat = ({
     setNotification,
   } = ChatState();
   const { userInfo } = useSelector((state) => state.auth);
-  const [videoCall,setVideoCall] = useState(false);
+  const [videoCall, setVideoCall] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [sendMessage] = useSendMessageMutation();
   const [messages, setMessages] = useState([]);
@@ -92,6 +92,7 @@ const SingleChat = ({
       }).unwrap();
       socket.emit("new message", res);
       setMessages([...messages, res]);
+      setFetchAgain(!fetchagain);
     } catch (error) {}
   };
   const handleVideoCall = async () => {
@@ -113,6 +114,23 @@ const SingleChat = ({
       console.log(error);
     }
   };
+  const renderMessageTimestamp = (currentTimestamp, nextTimestamp) => {
+    if(!currentTimestamp || !nextTimestamp){
+      return null
+    }
+    const currentTime = new Date(currentTimestamp);
+    const nextTime = new Date(nextTimestamp);
+
+    // Calculate the time difference in minutes
+    const timeDifference = Math.floor((nextTime - currentTime) / (1000 * 60));
+
+    if (timeDifference > 30) {
+      // If the time difference is greater than 30 minutes, display the previous message timestamp
+      return <span className="">{currentTime.toLocaleString()}</span>;
+    }
+
+    return null; // If the time difference is not greater than 30 minutes, don't display anything
+  };
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", userInfo.id);
@@ -122,9 +140,9 @@ const SingleChat = ({
     socket.on("recieveVideoCall", (id) => {
       console.log("recieved");
       // navigate(`/call/${id}`);
-      setVideoCall(id)
+      setVideoCall(id);
       setTimeout(() => {
-        setVideoCall('')
+        setVideoCall("");
       }, 10000);
     });
   }, []);
@@ -145,7 +163,7 @@ const SingleChat = ({
         setFetchAgain(!fetchagain);
       } else {
         setMessages([...messages, newMessageRecieved]);
-       console.log(setFetchAgain)
+        console.log(setFetchAgain);
         setFetchAgain(!fetchagain);
       }
     });
@@ -236,30 +254,41 @@ const SingleChat = ({
 
         {messages &&
           messages.map((message, index) => (
-            <div
-              key={index}
-              className={`mb-2  ${
-                message.sender === userInfo.id ? "text-right" : ""
-              }`}
-            >
+            <>
               <div
-                className={`inline-block mx-3 px-4 py-2 rounded-full ${
-                  message.sender === userInfo.id
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-800 text-gray-200"
+                key={index}
+                className={`mb-2  ${
+                  message.sender === userInfo.id ? "text-right" : ""
                 }`}
               >
-                {message.content}
-              </div>
-              {/* {messages.length - 1 === index &&
+                <div
+                  className={`inline-block mx-3 px-4 py-2 rounded-full ${
+                    message.sender === userInfo.id
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-800 text-gray-200"
+                  }`}
+                >
+                  {message.content}
+                </div>
+
+                {/* {messages.length - 1 === index &&
               message.sender === userInfo.id &&
               message.read ? (
                 <p className="text-sm text-gray-400 mr-4">Seen</p>
               ) : null} */}
-            </div>
+              </div>
+              <div className="text-center">
+                <div className="text-center font-medium text-xs mb-2 text-gray-400">
+                  {renderMessageTimestamp(
+                    message?.createdAt,
+                    messages[index + 1]?.createdAt
+                  )}
+                </div>
+              </div>
+            </>
           ))}
         {isTyping && (
-          <p className="px-3">
+          <p className="px-3 ">
             <BsThreeDots className="animate-pulse" size={27} />
           </p>
         )}

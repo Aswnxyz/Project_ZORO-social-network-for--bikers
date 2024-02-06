@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
+
 import {
   FaBookmark,
   FaHeart,
@@ -20,6 +21,7 @@ import {
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RiShareBoxLine } from "react-icons/ri";
+import { toast } from "react-toastify";
 
 const CommentModal = ({
   open,
@@ -33,6 +35,7 @@ const CommentModal = ({
   handleLike,
   commentsCount,
   savedPosts,
+  handleSavedPost,
 }) => {
   const [isHovered, setIsHovered] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -56,6 +59,10 @@ const CommentModal = ({
 
   const handleCommentUpload = async () => {
     try {
+      if (comment.trim() === "") {
+        toast.error("Comment cannot be empty!");
+        return;
+      }
       const res = await commentPost({
         postId: _id,
         text: comment,
@@ -313,12 +320,12 @@ const CommentModal = ({
                   )} */}
                   <RiShareBoxLine size={27} />
                 </div>
-                <span>
-                  {savedPosts.includes(_id)? (
-                  <FaBookmark size={24} />
-                  ) : ( 
-                  <FaRegBookmark size={24} /> 
-                  )} 
+                <span onClick={handleSavedPost}>
+                  {savedPosts.includes(_id) ? (
+                    <FaBookmark size={24} />
+                  ) : (
+                    <FaRegBookmark size={24} />
+                  )}
                 </span>
               </div>
               <p className="p-2">{likes.length} likes</p>
@@ -332,6 +339,8 @@ const CommentModal = ({
                   <input
                     className="bg-black w-[24rem] focus:outline-none "
                     type="text"
+                    pattern="^\S*$"
+                    title="Spaces are not allowed"
                     placeholder="Add a comment..."
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}

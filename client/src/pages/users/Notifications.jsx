@@ -68,7 +68,7 @@ const Notifications = () => {
       <h1 className=" text-2xl font-semibold py-4">Notifications</h1>
       <div>
         {/* <p>Today</p> */}
-        {!notifications.length && <h1 className="text-center mt-20 text-3xl font-semibold inset-0">No new notificatons</h1>}
+        {!notifications.length && !isLoading && <h1 className="text-center mt-20 text-3xl font-semibold inset-0">No new notificatons</h1>}
         {notifications.map((notification, index) => (
           <div key={index} className="flex justify-between items-center">
             <div className="flex items-center  py-4">

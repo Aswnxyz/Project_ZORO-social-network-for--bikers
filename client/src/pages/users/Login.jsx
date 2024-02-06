@@ -18,12 +18,10 @@ function Login() {
   const [googleAuth] = useGoogleAuthMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-   const { userInfo } = useSelector((state) => state.auth);
-
- 
+  const { userInfo } = useSelector((state) => state.auth);
 
   const validateForm = () => {
-    if ( !emailOrUserName || !password ) {
+    if (!emailOrUserName || !password) {
       toast.error("Please fill in all fields.");
       return false;
     }
@@ -33,7 +31,6 @@ function Login() {
     }
     return true;
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +42,7 @@ function Login() {
 
       // Construct the request object based on whether it's an email or a username
       const requestData = isEmail
-        ? { email:emailOrUserName, password }
+        ? { email: emailOrUserName, password }
         : { userName: emailOrUserName, password };
       const res = await login(requestData).unwrap();
       dispatch(setCredentials({ ...res }));
@@ -66,11 +63,11 @@ function Login() {
     }
   };
 
-    useEffect(() => {
-      if (userInfo) {
-        navigate("/");
-      }
-    }, []);
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, []);
   return (
     <>
       <div>

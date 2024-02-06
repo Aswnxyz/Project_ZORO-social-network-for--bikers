@@ -34,6 +34,7 @@ const Post = ({
   _id,
   totalComments,
   savedPosts,
+  setPosts,
 }) => {
   const [likedUsers, setLikedUsers] = useState([]);
   const [liked, setLiked] = useState(false);
@@ -153,9 +154,11 @@ const Post = ({
                 <div className="px-4 text-white  ">
                   {" "}
                   <div className="flex">
-                    <p className="text-lg text-white font-semibold">
-                      {community.name}
-                    </p>
+                    <Link to={`/clubs/${community._id}`}>
+                      <p className="text-lg text-white font-semibold">
+                        {community.name}
+                      </p>
+                    </Link>
                     {/* <span className="mx-2 text-sm text-gray-400"> by </span> */}
                     <div className="flex">
                       <span className="px-2 dark:text-gray-500">
@@ -262,11 +265,13 @@ const Post = ({
             )
           }
           savedPosts={savedPosts}
+          handleSavedPost={handleSavedPost}
         />
       )}
       {optionsModal && (
         <MoreOptionsModal
           onClose={() => SetOptionsModal(false)}
+          setPosts={setPosts}
           postId={_id}
           userName={user.userName}
           postDetails={{ media, des, _id }}

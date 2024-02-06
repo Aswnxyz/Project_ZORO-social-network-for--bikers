@@ -9,6 +9,8 @@ import Swal from "sweetalert2";
 import EditPostModal from "./EditPostModal";
 
 const MoreOptionsModal = ({
+  setPosts,
+
   onClose,
   postId,
   userName,
@@ -44,7 +46,9 @@ const MoreOptionsModal = ({
   const handleDeletePost = async () => {
     try {
       const res = await deletePost({ postId }).unwrap();
+      console.log(res);
       onClose();
+      setPosts((prev) => prev.filter((post) => post._id !== res._id));
     } catch (error) {
       console.log(error.data);
     }
@@ -188,7 +192,11 @@ const MoreOptionsModal = ({
         )}
         {/* Edit post */}
         {activeModal === "edit" && (
-          <EditPostModal post={postDetails} onClose={onClose} updatePost={(des)=>updatePost(des)} />
+          <EditPostModal
+            post={postDetails}
+            onClose={onClose}
+            updatePost={(des) => updatePost(des)}
+          />
         )}
       </div>
     </div>

@@ -7,7 +7,11 @@ import { ToastContainer } from "react-toastify";
 const Clubs = () => {
   const navigate = useNavigate()
   useEffect(()=>{
-navigate('/clubs/discover')
+    console.log(window.location)
+    if(window.location.pathname==="/clubs"){
+
+      navigate('/clubs/discover')
+    }
   },[])
   return (
     <div className="flex  h-screen text-white">

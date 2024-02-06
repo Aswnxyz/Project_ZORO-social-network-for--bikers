@@ -73,10 +73,12 @@ const CreatPostModal = ({ open, onClose, communityId, addNewPost }) => {
 
   const handleSubmit = async () => {
     try {
+          const trimmedCaption = caption.trim();
+
       console.log(croppedImage);
       const formData = new FormData();
       formData.append("image", croppedImage);
-      formData.append("des", caption);
+      formData.append("des", trimmedCaption);
       if (communityId) {
         formData.append("communityId", communityId);
       }

@@ -17,13 +17,14 @@ import { CiMail } from "react-icons/ci";
 import { MdDoNotDisturb } from "react-icons/md";
 import { useSelector } from "react-redux";
 import InviteEventModal from "./Modals/InviteEventModal";
+import { ImSpinner2 } from "react-icons/im";
 
 const EventBox = () => {
   const [inviteFollowers,setInviteFollowers] = useState(false)
   const {userInfo} = useSelector(state=>state.auth)
   const { eventId } = useParams();
   const [response, setResponse] = useState("");
-  const [getEvent] = useGetEventByIdMutation();
+  const [getEvent,{isLoading}] = useGetEventByIdMutation();
   const [eventData, setEventData] = useState();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [respondEvent] = useRespondEventMutation();
@@ -280,6 +281,11 @@ const EventBox = () => {
           onClose={() => setInviteFollowers(false)}
         />
       )}
+      {/* {isLoading && (
+        <div className="fixed  inset-0  bg-black bg-opacity-25 backdrop-blur-sm flex justify-center items-center">
+          <ImSpinner2 className="animate-spin" size={27} />
+        </div>
+      )} */}
     </>
   );
 };

@@ -1,30 +1,6 @@
 const { MessageRepository } = require("../database");
 const { RPCRequest } = require("../utils");
-const {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-} = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const crypto = require("crypto");
-const {
-  ACCESS_KEY,
-  SECRET_ACCESS_KEY,
-  BUCKET_REGION,
-  BUCKET_NAME,
-} = require("../config");
-const { userInfo } = require("os");
 
-const randomImageName = (bytes = 32) =>
-  crypto.randomBytes(bytes).toString("hex");
-
-const s3 = new S3Client({
-  credentials: {
-    accessKeyId: ACCESS_KEY,
-    secretAccessKey: SECRET_ACCESS_KEY,
-  },
-  region: BUCKET_REGION,
-});
 
 class MessageService {
   constructor(io) {

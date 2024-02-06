@@ -9,7 +9,7 @@ import { MdGroups } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { IoIosArrowDown, IoMdAdd } from "react-icons/io";
 import { FaRightFromBracket } from "react-icons/fa6";
-import { ImFilePicture } from "react-icons/im";
+import { ImFilePicture, ImSpinner2 } from "react-icons/im";
 import CreatePostModal from "../components/Modals/CreatePostModal";
 import Post from "./Post";
 import { ToastContainer, toast } from "react-toastify";
@@ -17,7 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const ClubBox = () => {
   const { communityId } = useParams();
-  const [getDetails] = useGetCommunityDetailsMutation();
+  const [getDetails, { isLoading }] = useGetCommunityDetailsMutation();
   const [selectedCommunity, setSelectedCommunity] = useState(null);
   const [communityPosts, setCommunityPosts] = useState([]);
   const { userInfo } = useSelector((state) => state.auth);
@@ -54,7 +54,6 @@ const ClubBox = () => {
   }, [communityId]);
   return (
     <>
-
       <div className="text-white p-3 overflow-y-auto">
         <div>
           <div>
@@ -174,13 +173,20 @@ const ClubBox = () => {
             </div>
           ))}
         </div>
+        {isLoading && (
+          <div className="fixed  inset-0  bg-black bg-opacity-25 backdrop-blur-sm flex justify-center items-center">
+            <ImSpinner2 className="animate-spin" size={27} />
+          </div>
+        )}
       </div>
       {createPostModal && (
         <CreatePostModal
           open={createPostModal}
           onClose={() => setCreatePostModal(false)}
           communityId={communityId}
-          addNewPost ={(newPost)=> setCommunityPosts((prev)=> [newPost,...prev])}
+          addNewPost={(newPost) =>
+            setCommunityPosts((prev) => [newPost, ...prev])
+          }
         />
       )}
     </>

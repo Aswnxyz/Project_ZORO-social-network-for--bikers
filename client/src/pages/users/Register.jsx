@@ -19,7 +19,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-     const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [register] = useRegisterMutation();
   const [googleAuth] = useGoogleAuthMutation();
@@ -29,24 +29,37 @@ function Register() {
       toast.error("Please fill in all fields.");
       return false;
     }
-      if (password.length < 8) {
-        toast.error("Password must be at least 8 characters long.");
-        return false;
-      }
-      return true
+    if(userName.includes(' ')){
+      toast.warn("Usernames cannot contain spaces!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long.");
+      return false;
+    }
+    return true;
   };
 
-    const handleInput = (e) => {
-      // Convert the entered text to lowercase
-      const lowercaseValue = e.target.value.toLowerCase();
-      setUserName(lowercaseValue);
-    };
+  const handleInput = (e) => {
+    // Convert the entered text to lowercase
+    const lowercaseValue = e.target.value.toLowerCase();
+    setUserName(lowercaseValue);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     if (!validateForm()) {
-       return;
-     }
+    if (!validateForm()) {
+      return;
+    }
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");
     } else {
@@ -73,11 +86,11 @@ function Register() {
       toast.error(error?.data?.message || error.error);
     }
   };
- useEffect(() => {
-   if (userInfo) {
-     navigate("/");
-   }
- }, []);
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, []);
   return (
     <>
       <div className="w-full h-screen">
@@ -120,6 +133,8 @@ function Register() {
                         name="userName"
                         // onChange={(e) => setUserName(e.target.value)}
                         value={userName}
+                        pattern="^\S*$"
+                        title="Spaces are not allowed"
                         onInput={handleInput}
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Enter username"
@@ -169,6 +184,7 @@ function Register() {
                       </label>
                       <input
                         type="password"
+                        pattern="^\S*$"
                         name="password"
                         onChange={(e) => setPassword(e.target.value)}
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -186,6 +202,7 @@ function Register() {
                       <input
                         type="password"
                         name="confirmPassword"
+                        pattern="^\S*$"
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Confirm "
                         className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -193,31 +210,7 @@ function Register() {
                       />
                     </div>
                   </div>
-                  {/* <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="terms"
-                      aria-describedby="terms"
-                      type="checkbox"
-                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                      required=""
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="terms"
-                      className="font-light text-gray-500 dark:text-gray-300"
-                    >
-                      I accept the{" "}
-                      <a
-                        className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                        href="#"
-                      >
-                        Terms and Conditions
-                      </a>
-                    </label>
-                  </div>
-                </div> */}
+               
                   <button
                     id="submitButton"
                     type="submit"

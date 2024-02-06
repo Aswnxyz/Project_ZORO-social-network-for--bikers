@@ -45,7 +45,7 @@ const usePostsList = (pageNumber) => {
     fetchData();
   }, [pageNumber]);
 
-  return { posts, loading, error, hasMore };
+  return { posts,setPosts, loading, error, hasMore };
 };
 
 export default usePostsList;
