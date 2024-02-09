@@ -4,10 +4,8 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { IoCreateOutline } from "react-icons/io5";
-import { LuDot } from "react-icons/lu";
-import { MdEmojiEmotions } from "react-icons/md";
+
 import { useSelector } from "react-redux";
-import { useActionData } from "react-router-dom";
 import { useSearchUsersMutation } from "../utils/slices/userApiSlice";
 import {
   useAccessChatMutation,
@@ -15,7 +13,7 @@ import {
 } from "../utils/slices/messageApiSlice";
 import { ChatState } from "../Context/ChatProvider";
 import {  getSenderImage, getSenderName } from "../config/ChatLogics";
-import CreateGroup from "./Modals/createGroup";
+import CreateGroup from "./Modals/CreateGroup";
 
 const MyChats = ({ fetchagain, setMessagesInfo }) => {
   const [searchClicked, setSearchClicked] = useState(false);

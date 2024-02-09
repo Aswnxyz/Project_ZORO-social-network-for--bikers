@@ -1,8 +1,10 @@
-const { NotFoundError } = require("../../../users/src/utils/errors/app-errors");
 const { AdminRepository } = require("../database");
 const { ValidatePassword, GenerateSignature } = require("../utils");
 const { RPCRequest } = require("../utils");
-const { ValidationError } = require("../utils/errors/app-errors");
+const {
+  ValidationError,
+  NotFoundError,
+} = require("../utils/errors/app-errors");
 
 class AdminService {
   constructor() {
@@ -11,7 +13,6 @@ class AdminService {
   async signIn(res, adminInputs) {
     const { email, password } = adminInputs;
     const admin = await this.repositiory.findAdmin(email);
-    
 
     if (!admin)
       throw new NotFoundError("admin not found with provided email id!");
@@ -57,7 +58,7 @@ class AdminService {
     //Perform RPC call
     const postsResponse = await RPCRequest("POSTS_RPC", {
       type: "GET_POSTS",
-      data:{page:currentPage,perPage:postsPerPage}
+      data: { page: currentPage, perPage: postsPerPage },
     });
 
     if (postsResponse) {
@@ -66,13 +67,13 @@ class AdminService {
     return {};
   }
 
-  async handlePostBlock({postId}){
-    const postsResponse = await RPCRequest("POSTS_RPC",{
-      type:"HANDLE_BLOCK",
-      data:{postId}
+  async handlePostBlock({ postId }) {
+    const postsResponse = await RPCRequest("POSTS_RPC", {
+      type: "HANDLE_BLOCK",
+      data: { postId },
     });
-    if(postsResponse){
-      return postsResponse
+    if (postsResponse) {
+      return postsResponse;
     }
   }
 }

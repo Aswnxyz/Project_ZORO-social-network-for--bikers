@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== "prod") {
 }
 module.exports = {
   PORT: process.env.PORT,
-  DB_URL: process.env.MONGODB_URI,
+  DB_URL: process.env.MONGODB_URI + "zoro_posts",
   APP_SECRET: process.env.JWT_SECRET,
   CLOUD_NAME: process.env.CLOUD_NAME,
   API_KEY: process.env.API_KEY,

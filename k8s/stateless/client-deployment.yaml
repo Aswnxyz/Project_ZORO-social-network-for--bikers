@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client-container
-          image: your-docker-registry/your-image-name:latest
+          image: aswin5352/zoro_client
           ports:
             - containerPort: 5173
           
@@ -23,10 +23,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-service
+  name: client-service
 spec:
   selector:
-    app: users
+    app: client
   ports:
     - protocol: TCP
       port: 5173

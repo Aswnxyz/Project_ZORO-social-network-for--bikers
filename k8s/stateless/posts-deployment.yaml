@@ -14,72 +14,72 @@ spec:
     spec:
       containers:
         - name: posts-container
-          image: your-docker-registry/your-image-name:latest
+          image: aswin5352/zoro_posts
           ports:
             - containerPort: 8002
           env:
             - name: MONGODB_URI
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: MONGODB_URI
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: JWT_SECRET
             - name: MSG_QUEUE_URL
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: MSG_QUEUE_URL
             - name: EXCHANGE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: EXCHANGE_NAME
             - name: CLOUD_NAME
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: CLOUD_NAME
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: API_KEY
             - name: API_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: API_SECRET
             - name: BUCKET_NAME
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: BUCKET_NAME
             - name: BUCKET_REGION
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: BUCKET_REGION
             - name: ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: ACCESS_KEY
             - name: SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: user-secret
                   key: SECRET_ACCESS_KEY
             - name: PORT
-              value: 8002
+              value: "8002"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: poasts-service
+  name: posts-service
 spec:
   selector:
     app: posts

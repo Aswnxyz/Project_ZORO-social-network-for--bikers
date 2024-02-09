@@ -14,32 +14,32 @@ spec:
     spec:
       containers:
         - name: admin-container
-          image: your-docker-registry/your-image-name:latest
+          image: aswin5352/zoro_admin
           ports:
             - containerPort: 8080
           env:
             - name: MONGODB_URI
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: admin-secret
                   key: MONGODB_URI
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: admin-secret
                   key: JWT_SECRET
             - name: MSG_QUEUE_URL
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: admin-secret
                   key: MSG_QUEUE_URL
             - name: EXCHANGE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: zoro-secret
+                  name: admin-secret
                   key: EXCHANGE_NAME
             - name: PORT
-              value: 5173
+              value: "8080"
 ---
 apiVersion: v1
 kind: Service
