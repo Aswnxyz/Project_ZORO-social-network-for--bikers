@@ -16,7 +16,7 @@ spec:
               service:
                 name: client-service
                 port:
-                  number: 80
+                  number: 5173
 
 ---
 apiVersion: v1
