@@ -14,10 +14,7 @@ spec:
     spec:
       containers:
         - name: client-container
-          image: aswin5352/zoro_client
-          ports:
-            - containerPort: 5173
-          
+          image: aswin5352/zoro_client      
 
 ---
 apiVersion: v1
@@ -28,6 +25,7 @@ spec:
   selector:
     app: client
   ports:
-    - protocol: TCP
-      port: 5173
-      targetPort: 5173
+    - name: client
+      protocol: TCP
+      port: 80
+      targetPort: 80
