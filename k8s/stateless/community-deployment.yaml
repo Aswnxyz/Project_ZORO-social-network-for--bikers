@@ -15,8 +15,6 @@ spec:
       containers:
         - name: community-container
           image: aswin5352/zoro_community
-          ports:
-            - containerPort: 8005
           env:
             - name: MONGODB_URI
               valueFrom:

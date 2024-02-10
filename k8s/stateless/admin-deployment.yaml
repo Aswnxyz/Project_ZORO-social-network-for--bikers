@@ -15,8 +15,6 @@ spec:
       containers:
         - name: admin-container
           image: aswin5352/zoro_admin
-          ports:
-            - containerPort: 8080
           env:
             - name: MONGODB_URI
               valueFrom:

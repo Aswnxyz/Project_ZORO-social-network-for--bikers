@@ -15,8 +15,6 @@ spec:
       containers:
         - name: events-container
           image: aswin5352/zoro_events
-          ports:
-            - containerPort: 8006
           env:
             - name: MONGODB_URI
               valueFrom:

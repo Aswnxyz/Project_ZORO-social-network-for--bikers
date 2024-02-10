@@ -15,8 +15,6 @@ spec:
       containers:
         - name: notification-container
           image: aswin5352/zoro_notifications
-          ports:
-            - containerPort: 8003
           env:
             - name: MONGODB_URI
               valueFrom:

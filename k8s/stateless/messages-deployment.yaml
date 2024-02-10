@@ -15,8 +15,6 @@ spec:
       containers:
         - name: messages-container
           image: aswin5352/zoro_messages
-          ports:
-            - containerPort: 8004
           env:
             - name: MONGODB_URI
               valueFrom:

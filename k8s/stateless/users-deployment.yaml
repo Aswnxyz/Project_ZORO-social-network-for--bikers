@@ -15,8 +15,6 @@ spec:
       containers:
         - name: users-container
           image: aswin5352/zoro_users
-          ports:
-            - containerPort: 8001
           env:
             - name: MONGODB_URI
               valueFrom:
