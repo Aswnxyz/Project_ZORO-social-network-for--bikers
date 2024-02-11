@@ -1,5 +1,7 @@
 import { apiSlice } from "./apiSlice";
-const MESSAGE_URL = "http://localhost:8004";
+import { MESSAGE_SERVICE } from "../../constants/constant";
+
+const MESSAGE_URL = MESSAGE_SERVICE;
 
 export const messageApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

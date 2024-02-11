@@ -1,5 +1,7 @@
 import { apiSlice } from "./apiSlice";
-const NOTIFICATION_URL = "http://localhost:8003";
+import { NOTIFICATION_SERVICE } from "../../constants/constant";
+
+const NOTIFICATION_URL = NOTIFICATION_SERVICE;
 
 export const notificationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

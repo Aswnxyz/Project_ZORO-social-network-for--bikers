@@ -3,14 +3,17 @@ const userAuth = require("./middlewares/auth");
 const { RPCObserver, PublishMessage } = require("../utils");
 const { NOTIFICATION_SERVICE } = require("../config");
 const multer = require("multer");
+const express = require("express");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 module.exports = (app, channel) => {
   const service = new PostService();
 
   RPCObserver("POSTS_RPC", service);
+  const router = express.Router();
+  
 
-  app.post("/createPost", userAuth,upload.single("image"), async (req, res, next) => {
+  router.post("/createPost", userAuth,upload.single("image"), async (req, res, next) => {
     try {
       console.log("req.body", req.body);
       console.log("req.file", req.file);
@@ -30,7 +33,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.get("/getPosts", userAuth, async (req, res, next) => {
+  router.get("/getPosts", userAuth, async (req, res, next) => {
     try {
       const data = await service.getPosts(req.query);
       return res.status(200).json(data);
@@ -39,7 +42,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/likePost", userAuth, async (req, res, next) => {
+  router.post("/likePost", userAuth, async (req, res, next) => {
     try {
       const { data, payload } = await service.handleLikePost(req.body);
       PublishMessage(channel, NOTIFICATION_SERVICE, JSON.stringify(payload));
@@ -49,7 +52,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/commentPost", userAuth, async (req, res, next) => {
+  router.post("/commentPost", userAuth, async (req, res, next) => {
     try {
       const { data, payload } = await service.commentPost(
         req.body,
@@ -63,7 +66,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/getComments", userAuth, async (req, res, next) => {
+  router.post("/getComments", userAuth, async (req, res, next) => {
     const { _id } = req.body;
     try {
       const data = await service.getComments(_id);
@@ -73,7 +76,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/likeComment", userAuth, async (req, res, next) => {
+  router.post("/likeComment", userAuth, async (req, res, next) => {
     try {
       const data = await service.handleLikeComment(req.body, req.user._id);
       return res.status(200).json(data);
@@ -82,7 +85,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/reportPost", userAuth, async (req, res, next) => {
+  router.post("/reportPost", userAuth, async (req, res, next) => {
     try {
       const data = await service.reportPost(req.body);
       return res.status(200).json(data);
@@ -91,7 +94,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/deletePost", userAuth, async (req, res, next) => {
+  router.post("/deletePost", userAuth, async (req, res, next) => {
     try {
       const data = await service.repository.deletePost(req.body);
       return res.status(200).json(data);
@@ -100,7 +103,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/editPost", userAuth, async (req, res, next) => {
+  router.post("/editPost", userAuth, async (req, res, next) => {
     try {
       const data = await service.repository.editPost(req.body);
       return res.status(200).json(data);
@@ -109,7 +112,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.delete("/deleteComment", userAuth, async (req, res, next) => {
+  router.delete("/deleteComment", userAuth, async (req, res, next) => {
     try {
       const { data, payload } = await service.deleteComment(
         req.body,
@@ -122,4 +125,5 @@ module.exports = (app, channel) => {
       next(error);
     }
   });
+  app.use("/api/posts", router);
 };

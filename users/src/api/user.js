@@ -2,13 +2,15 @@ const UserService = require("../services/user-service");
 const userAuth = require("./middlewares/auth");
 const { RPCObserver, PublishMessage } = require("../utils");
 const { NOTIFICATION_SERVICE } = require("../config");
+const express = require('express')
 
 module.exports = (app, channel) => {
   const service = new UserService();
 
   RPCObserver("USERS_RPC", service);
+  const router = express.Router();
 
-  app.post("/signup", async (req, res, next) => {
+  router.post("/signup", async (req, res, next) => {
     try {
       const { userName, fullName, email, password } = req.body;
       const data = await service.signUp(
@@ -21,7 +23,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/login", async (req, res, next) => {
+  router.post("/login", async (req, res, next) => {
     try {
       const userData = req.body;
       const data = await service.signIn(userData, res);
@@ -32,7 +34,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/verifyOtp", async (req, res, next) => {
+  router.post("/verifyOtp", async (req, res, next) => {
     try {
       const { email, otp } = req.body;
 
@@ -43,7 +45,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/googleAuth", async (req, res, next) => {
+  router.post("/googleAuth", async (req, res, next) => {
     try {
       const decoded = req.body;
       const data = await service.googleAuth(decoded, res);
@@ -54,7 +56,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.get("/getUser", userAuth, async (req, res, next) => {
+  router.get("/getUser", userAuth, async (req, res, next) => {
     try {
       const data = await service.repository.findUserById(req.user._id);
       return res.status(200).json(data);
@@ -63,7 +65,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/profile", userAuth, async (req, res, next) => {
+  router.post("/profile", userAuth, async (req, res, next) => {
     try {
       const { userName } = req.body;
       const data = await service.getProfile(userName);
@@ -72,7 +74,7 @@ module.exports = (app, channel) => {
       next(error);
     }
   });
-  app.post("/editProfile", userAuth, async (req, res, next) => {
+  router.post("/editProfile", userAuth, async (req, res, next) => {
     try {
       const { _id } = req.user;
       const userData = req.body;
@@ -83,7 +85,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/logout", async (req, res, next) => {
+  router.post("/logout", async (req, res, next) => {
     try {
       res.cookie("jwt", "", {
         httpOnly: true,
@@ -95,7 +97,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/followUser", userAuth, async (req, res, next) => {
+  router.post("/followUser", userAuth, async (req, res, next) => {
     try {
       const { _id } = req.user;
       const { data, payload } = await service.followUser(req.body, _id);
@@ -106,7 +108,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/getUsers", userAuth, async (req, res, next) => {
+  router.post("/getUsers", userAuth, async (req, res, next) => {
     try {
       const data = await service.getUsers(req.body);
       return res.status(200).json(data);
@@ -115,7 +117,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/savePost", userAuth, async (req, res, next) => {
+  router.post("/savePost", userAuth, async (req, res, next) => {
     try {
       const data = await service.savePost(req.body, req.user._id);
       return res.status(200).json(data);
@@ -124,7 +126,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/getSavedPosts", userAuth, async (req, res, next) => {
+  router.post("/getSavedPosts", userAuth, async (req, res, next) => {
     try {
       const data = await service.getSavedPosts(req.body);
       return res.status(200).json(data);
@@ -133,7 +135,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/createGarage", userAuth, async (req, res, next) => {
+  router.post("/createGarage", userAuth, async (req, res, next) => {
     try {
       const data = await service.createGarage(req.body, req.user._id);
 
@@ -142,7 +144,7 @@ module.exports = (app, channel) => {
       next(error);
     }
   });
-  app.get("/searchUsers", userAuth, async (req, res, next) => {
+  router.get("/searchUsers", userAuth, async (req, res, next) => {
     try {
       const data = await service.repository.searchUser(req.query);
       res.status(200).json(data);
@@ -151,7 +153,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/addRecentSearch", userAuth, async (req, res, next) => {
+  router.post("/addRecentSearch", userAuth, async (req, res, next) => {
     try {
       const data = await service.addToRecentSearch(req.body, req.user._id);
       return res.status(200).json(data);
@@ -160,7 +162,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.get("/getRecentSearches", userAuth, async (req, res, next) => {
+  router.get("/getRecentSearches", userAuth, async (req, res, next) => {
     try {
       const data = await service.getRecentUsers(req.user._id);
       return res.status(200).json(data);
@@ -169,7 +171,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.delete("/clearRecentSearch", userAuth, async (req, res, next) => {
+  router.delete("/clearRecentSearch", userAuth, async (req, res, next) => {
     try {
       const data = await service.clearRecentSearch(req.user._id);
       return res.json(data);
@@ -177,7 +179,7 @@ module.exports = (app, channel) => {
       next(error);
     }
   });
-  app.get("/getUserDataWithMessages", userAuth, async (req, res, next) => {
+  router.get("/getUserDataWithMessages", userAuth, async (req, res, next) => {
     try {
       const data = await service.getUserDataWithMessages(
         req.query.userId,
@@ -189,7 +191,7 @@ module.exports = (app, channel) => {
     }
   });
 
-  app.post("/changePassword", userAuth, async (req, res, next) => {
+  router.post("/changePassword", userAuth, async (req, res, next) => {
     try {
       const data = await service.changePassword(req.body, req.user._id);
       return res.json(data);
@@ -197,7 +199,7 @@ module.exports = (app, channel) => {
       next(error);
     }
   });
-  app.patch("/changePrivateAccount", userAuth, async (req, res, next) => {
+  router.patch("/changePrivateAccount", userAuth, async (req, res, next) => {
     try {
       const data = await service.managePrivateAccount(req.user._id);
       return res.status(200).json(data);
@@ -205,7 +207,7 @@ module.exports = (app, channel) => {
       next(error);
     }
   });
-  app.post("/followRequest", userAuth, async (req, res, next) => {
+  router.post("/followRequest", userAuth, async (req, res, next) => {
     try {
       const { data, removePayload, payload } =
         await service.manageFollowRequest(req.body, req.user._id);
@@ -222,4 +224,5 @@ module.exports = (app, channel) => {
       next(error);
     }
   });
+  app.use("/api/users", router);
 };

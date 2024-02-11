@@ -1,5 +1,7 @@
 import { apiSlice } from "./apiSlice";
-const EVENT_URL = "http://localhost:8006";
+import { EVENT_SERVICE } from "../../constants/constant";
+
+const EVENT_URL = EVENT_SERVICE;
 
 export const eventApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

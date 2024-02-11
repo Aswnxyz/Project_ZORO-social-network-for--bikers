@@ -1,9 +1,11 @@
 const NotificationService = require("../services/notification-service");
 const { SubscribeMessage } = require("../utils");
 const userAuth = require("./middlewares/auth")
+const express = require("express");
 module.exports = (app,channel,io) => {
   const service = new NotificationService(io);
     SubscribeMessage(channel, service);
+    const router = express.Router();
 
   io.on("connection", (socket) => {
     console.log("User connected to socket");
@@ -48,7 +50,7 @@ module.exports = (app,channel,io) => {
     // });
   });
 
-    app.get('/getNotifications',userAuth,async(req,res,next)=>{
+    router.get('/getNotifications',userAuth,async(req,res,next)=>{
         try {
           const data = await service.getNotifications(req.user._id);
           return res.status(200).json(data)
@@ -58,5 +60,7 @@ module.exports = (app,channel,io) => {
 
     })
     
+
+    app.use("/api/notification", router);
 
 }

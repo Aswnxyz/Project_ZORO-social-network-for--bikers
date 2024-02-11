@@ -5,9 +5,11 @@ const userAuth = require("./middlewares/auth");
 const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const express = require("express");
 module.exports = (app, channel,io) => {
   const service = new MessageService();
   RPCObserver("MESSAGES_RPC", channel, service);
+  const router = express.Router();
 
   io.on("connection",(socket)=>{
     console.log('connected to socket io');
@@ -49,7 +51,7 @@ module.exports = (app, channel,io) => {
 
 
 
-  app.post("/", userAuth, async (req, res, next) => {
+  router.post("/", userAuth, async (req, res, next) => {
     try {
       const data = await service.accessChat(req);
       return res.status(200).json(data);
@@ -57,7 +59,7 @@ module.exports = (app, channel,io) => {
       next(error);
     }
   });
-  app.get("/", userAuth, async (req, res, next) => {
+  router.get("/", userAuth, async (req, res, next) => {
     try {
       const data = await service.fetchData(req.user._id);
       return res.status(200).json(data);
@@ -65,7 +67,7 @@ module.exports = (app, channel,io) => {
       next(error);
     }
   });
-  app.post("/group", userAuth, async (req, res, next) => {
+  router.post("/group", userAuth, async (req, res, next) => {
     try {
       const data = await service.createGroupChat(req);
       return res.status(200).json(data);
@@ -73,7 +75,7 @@ module.exports = (app, channel,io) => {
       next(error);
     }
   });
-  app.put("/rename", userAuth, async (req, res, next) => {
+  router.put("/rename", userAuth, async (req, res, next) => {
     try {
       const data = await service.renameGroup(req.body);
       return res.status(200).json(data);
@@ -81,7 +83,7 @@ module.exports = (app, channel,io) => {
       next(error);
     }
   });
-  app.put("/addUserToGroup", userAuth, async (req, res, next) => {
+  router.put("/addUserToGroup", userAuth, async (req, res, next) => {
     try {
       const data = await service.addUserToGroup(req.body);
       return res.status(200).json(data);
@@ -89,7 +91,7 @@ module.exports = (app, channel,io) => {
       next(error);
     }
   });
-  app.put("/removeUserFromGroup", userAuth, async (req, res, next) => {
+  router.put("/removeUserFromGroup", userAuth, async (req, res, next) => {
     try {
       const data = await service.removeUserFromGroup(req.body);
       return res.status(200).json(data);
@@ -97,7 +99,7 @@ module.exports = (app, channel,io) => {
       next(error);
     }
   });
-  app.put("/leaveGroup",userAuth,async(req,res,next)=>{
+  router.put("/leaveGroup",userAuth,async(req,res,next)=>{
     try {
       const data = await service.leaveGroup(req);
       return res.status(200).json(data)
@@ -105,13 +107,13 @@ module.exports = (app, channel,io) => {
       next(error)
     }
   })
-  app.post("/message", userAuth, async (req, res, next) => {
+  router.post("/message", userAuth, async (req, res, next) => {
     try {
       const data = await service.sendMessage(req);
       return res.status(200).json(data)
     } catch (error) {next(error)}
   });
-  app.get("/message",userAuth,async(req,res,next)=>{
+  router.get("/message",userAuth,async(req,res,next)=>{
     try {
       const data = await service.getMessages(req);
       return res.status(200).json(data)
@@ -120,4 +122,6 @@ module.exports = (app, channel,io) => {
       next(error)
     }
   })
+
+  app.use("/api/message", router);
 };

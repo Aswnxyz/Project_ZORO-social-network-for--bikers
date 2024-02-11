@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice";
-const ADMIN_URL = "http://localhost:8080";
+import{ADMIN_SERVICE} from '../../constants/constant'
+const ADMIN_URL = ADMIN_SERVICE;
 
 export const adminApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

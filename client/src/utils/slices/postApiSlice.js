@@ -1,5 +1,7 @@
 import { apiSlice } from "./apiSlice";
-const POST_URL = "http://localhost:8002";
+import { POST_SERVICE } from "../../constants/constant";
+
+const POST_URL = POST_SERVICE;
 
 export const postApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

@@ -135,8 +135,8 @@ const Post = ({
                   <img
                     className=" h-10 w-10 rounded-xl"
                     src={
-                      community.image
-                        ? community.image?.url
+                      community?.image
+                        ? community?.image?.url
                         : "/img/profile_icon.jpeg"
                     }
                     alt=""
@@ -144,8 +144,8 @@ const Post = ({
                   <img
                     className="h-6 border border-black rounded-full absolute -bottom-1 right-0"
                     src={
-                      user.profilePic
-                        ? user.profilePic?.url
+                      user?.profilePic
+                        ? user?.profilePic?.url
                         : "/img/profile_icon.jpeg"
                     }
                     alt=""
@@ -154,15 +154,15 @@ const Post = ({
                 <div className="px-4 text-white  ">
                   {" "}
                   <div className="flex">
-                    <Link to={`/clubs/${community._id}`}>
+                    <Link to={`/clubs/${community?._id}`}>
                       <p className="text-lg text-white font-semibold">
-                        {community.name}
+                        {community?.name}
                       </p>
                     </Link>
                     {/* <span className="mx-2 text-sm text-gray-400"> by </span> */}
                     <div className="flex">
                       <span className="px-2 dark:text-gray-500">
-                        @{user.userName}
+                        @{user?.userName}
                       </span>{" "}
                       <LuDot className="pr-2 text-gray-400" size={28} />
                       <span className="dark:text-gray-500">

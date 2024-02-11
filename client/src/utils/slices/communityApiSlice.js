@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice";
-const COMMUNITY_URL = "http://localhost:8005";
+import {COMMUNITY_SERVICE} from "../../constants/constant"
+const COMMUNITY_URL = COMMUNITY_SERVICE;
 
 export const communityApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
