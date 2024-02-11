@@ -1,1 +1,5 @@
 k8s/secrets/
+.env
+.env.dev
+node_modules
+
