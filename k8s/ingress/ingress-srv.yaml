@@ -9,6 +9,10 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - www.shopzen.in.net
+      secretName: zoro-tls
   rules:
     - host: www.shopzen.in.net
       http:
