@@ -123,6 +123,7 @@ class UserService {
       followers: existingUser.followers,
       following: existingUser.following,
       savedPosts: existingUser.savedPosts,
+      token
     };
   }
   async googleAuth(decoded, res) {
