@@ -5,7 +5,7 @@ const express = require("express");
 
 module.exports = (app, channel) => {
   const service = new EventService();
-  const router = express.Router();
+  const router = express.Router();  
   router.post("/createEvent", userAuth, async (req, res, next) => {
     try {
       const data = await service.createEvent(req);
@@ -20,7 +20,7 @@ module.exports = (app, channel) => {
       console.log(data);
       return res.status(200).json(data);
     } catch (error) {
-      next(error);
+      next(error); 
     }
   });
 

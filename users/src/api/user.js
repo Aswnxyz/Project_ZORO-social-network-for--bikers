@@ -58,7 +58,7 @@ module.exports = (app, channel) => {
   });
 
   router.get("/getUser", userAuth, async (req, res, next) => {
-          console.log("success");
+          console.log('success')
 
     try {
       const data = await service.repository.findUserById(req.user._id);
