@@ -25,6 +25,7 @@ module.exports = (app, channel) => {
 
   router.post("/login", async (req, res, next) => {
     try {
+      console.log('success')
       const userData = req.body;
       const data = await service.signIn(userData, res);
 
@@ -57,6 +58,8 @@ module.exports = (app, channel) => {
   });
 
   router.get("/getUser", userAuth, async (req, res, next) => {
+          console.log("success");
+
     try {
       const data = await service.repository.findUserById(req.user._id);
       return res.status(200).json(data);

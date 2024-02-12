@@ -1,6 +1,7 @@
 const { ValidateSignature } = require("../../utils")
 
 module.exports= async(req,res,next)=>{
+    console.log('success')
     try {
         
         const isAuthorised = await ValidateSignature(req);

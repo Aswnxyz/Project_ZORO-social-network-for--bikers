@@ -11,10 +11,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - www.shopzen.in.net
+        - shopzen.in.net
       secretName: zoro-tls
   rules:
-    - host: www.shopzen.in.net
+    - host: shopzen.in.net
       http:
         paths:
           - path: /api/users/?(.*)
