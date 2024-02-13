@@ -1,7 +1,11 @@
 version: "3"
 services:
+
+
   client:
-    image: aswin5352/zoro_client
+    build:
+      dockerfile: Dockerfile
+      context: ./client
     container_name: client
     ports:
       - 5173:80
@@ -9,7 +13,9 @@ services:
     env_file:
       - ./users/.env
   users:
-    image: aswin5352/zoro_users
+    build:
+      dockerfile: Dockerfile
+      context: ./users
     container_name: users
     ports:
       - 8001:8001
@@ -17,7 +23,9 @@ services:
     env_file:
       - ./users/.env
   posts:
-    image: aswin5352/zoro_posts
+    build:
+      dockerfile: Dockerfile
+      context: ./posts
     container_name: posts
     ports:
       - 8002:8002
@@ -25,7 +33,9 @@ services:
     env_file:
       - ./posts/.env
   messaging:
-    image: aswin5352/zoro_messages
+    build:
+      dockerfile: Dockerfile
+      context: ./messages
     container_name: messaging
     ports:
       - 8004:8004
@@ -33,7 +43,9 @@ services:
     env_file:
       - ./messages/.env
   notification:
-    image: aswin5352/zoro_notifications
+    build:
+      dockerfile: Dockerfile
+      context: ./notification
     container_name: notification
     ports:
       - 8003:8003
@@ -41,7 +53,9 @@ services:
     env_file:
       - ./notification/.env
   community:
-    image: aswin5352/zoro_community
+    build:
+      dockerfile: Dockerfile
+      context: ./community
     container_name: community
     ports:
       - 8005:8005
@@ -49,7 +63,9 @@ services:
     env_file:
       - ./community/.env
   events:
-    image: aswin5352/zoro_events
+    build:
+      dockerfile: Dockerfile
+      context: ./events
     container_name: events
     ports:
       - 8006:8006
@@ -57,7 +73,9 @@ services:
     env_file:
       - ./events/.env
   admin:
-    image: aswin5352/zoro_admin
+    build:
+      dockerfile: Dockerfile
+      context: ./admin
     container_name: admin
     ports:
       - 8080:8080

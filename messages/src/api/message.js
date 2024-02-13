@@ -17,7 +17,7 @@ module.exports = (app, channel,io) => {
     socket.on("setup",(userId)=>{
       socket.join(userId)
       console.log(userId)
-      socket.emit('connected')
+      socket.emit('connected');
     })
 
     socket.on("join chat",(room)=>{
