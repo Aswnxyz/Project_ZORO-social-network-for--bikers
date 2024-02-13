@@ -23,4 +23,8 @@ COPY static.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 # Default command to run NGINX
+<<<<<<< HEAD
 CMD ["nginx", "-g", "daemon off;"]
+=======
+CMD ["nginx", "-g", "daemon off;"]
+>>>>>>> 8a7624ac7318111a9b50c1f6f51ae65c8becf1ed
