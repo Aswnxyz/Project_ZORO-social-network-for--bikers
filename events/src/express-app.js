@@ -7,7 +7,7 @@ const { CreateChannel } = require("./utils");
 module.exports = async (app) => {
   app.use(
     cors({
-      origin: "http://localhost:5173",
+      origin: ["http://localhost:5173","https://zoro.shopzen.in.net"],
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Add the allowed methods
       allowedHeaders: ["Content-Type", "Authorization"], // Add allowed headers
       credentials: true, // Enable credentials (if needed)

@@ -22,7 +22,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { IoCall, IoVideocamOutline } from "react-icons/io5";
 import { PiVideoCameraBold } from "react-icons/pi";
 
-const ENDPOINT = "http://localhost:8004";
+const ENDPOINT = "https://zoro.shopzen.in.net/api/message";
 
 let socket, selectedChatCompare;
 

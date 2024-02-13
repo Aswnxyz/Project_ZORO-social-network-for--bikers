@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8003");
+const socket = io("https://zoro.shopzen.in.net/api/notification");
 
 export default socket;

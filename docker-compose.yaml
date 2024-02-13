@@ -8,7 +8,7 @@ services:
       context: ./client
     container_name: client
     ports:
-      - 4173:4173
+      - 5173:80
     restart: always
     env_file:
       - ./users/.env
