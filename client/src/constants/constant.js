@@ -1,15 +1,15 @@
 const USER_SERVICE = "https://zoro.shopzen.in.net/api/users";
 const POST_SERVICE = "https://zoro.shopzen.in.net/api/posts";
-const MESSAGE_SERVICE = "https://zoro.shopzen.in.net/message";
-const NOTIFICATION_SERVICE = "https://zoro.shopzen.in.net/notification";
+const MESSAGE_SERVICE = "https://zoro.shopzen.in.net/api/message";
+const NOTIFICATION_SERVICE = "https://zoro.shopzen.in.net/api/notification";
 const ADMIN_SERVICE = "https://zoro.shopzen.in.net/api/admin";
 const COMMUNITY_SERVICE = "https://zoro.shopzen.in.net/api/community";
 const EVENT_SERVICE = "https://zoro.shopzen.in.net/api/event";
 
 // const USER_SERVICE = "http://localhost:8001/api/users";
 // const POST_SERVICE = "http://localhost:8002/api/posts";
-// const MESSAGE_SERVICE = "http://localhost:8004/message";
-// const NOTIFICATION_SERVICE = "http://localhost:8003/notification";
+// const MESSAGE_SERVICE = "http://localhost:8004/api/message";
+// const NOTIFICATION_SERVICE = "http://localhost:8003/api/notification";
 // const ADMIN_SERVICE = "http://localhost:8080/api/admin";
 // const COMMUNITY_SERVICE = "http://localhost:8005/api/community";
 // const EVENT_SERVICE = "http://localhost:8006/api/event";

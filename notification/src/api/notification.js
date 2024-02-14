@@ -7,7 +7,7 @@ module.exports = (app, channel, io) => {
   SubscribeMessage(channel, service);
   const router = express.Router();
 
-  io.of("/notification").on("connection", (socket) => {
+  io.of("/api/notification").on("connection", (socket) => {
     console.log("User connected to socket");
 
     socket.on("registerUser", async (userId) => {
@@ -56,5 +56,5 @@ module.exports = (app, channel, io) => {
     }
   });
 
-  app.use("/notification", router);
+  app.use("/api/notification", router);
 };
