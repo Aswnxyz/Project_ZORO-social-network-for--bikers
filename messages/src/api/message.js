@@ -11,7 +11,7 @@ module.exports = (app, channel,io) => {
   RPCObserver("MESSAGES_RPC", channel, service);
   const router = express.Router();
 
-  io.of("/message").on("connection",(socket)=>{
+  io.of("/api/message").on("connection",(socket)=>{
     console.log('connected to socket io');
 
     socket.on("setup",(userId)=>{

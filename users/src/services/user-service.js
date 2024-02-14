@@ -76,9 +76,7 @@ class UserService {
       userName: existingUser.userName,
       pic: existingUser.profilePic?.url,
       fullName: existingUser.fullName,
-      followers:existingUser.followers,
-      following:existingUser.following,
-      savedPosts:existingUser.savedPosts
+
     };
   }
 
@@ -120,10 +118,8 @@ class UserService {
       userName: existingUser.userName,
       pic: existingUser.profilePic?.url,
       fullName: existingUser.fullName,
-      followers: existingUser.followers,
-      following: existingUser.following,
-      savedPosts: existingUser.savedPosts,
-      token
+
+      token,
     };
   }
   async googleAuth(decoded, res) {
@@ -162,9 +158,7 @@ class UserService {
       userName: existingUser.userName,
       pic: existingUser.profilePic?.url,
       fullName: existingUser.fullName,
-      followers: existingUser.followers,
-      following: existingUser.following,
-      savedPosts: existingUser.savedPosts,
+   
     };
   }
 
@@ -288,6 +282,14 @@ class UserService {
     );
   }
 
+  async searchUsersFromFollowing(query, userId) {
+    const result = await this.repository.searchUser(query);
+    const userData = await this.repository.findUserById(userId);
+    if (result.length > 0) {
+      return result.filter((user) => userData.following.includes(user._id));
+    }
+    return result;
+  }
   async addToRecentSearch({ userId }, _id) {
     return await this.repository.addRecentSearch(userId, _id);
   }
@@ -366,7 +368,6 @@ class UserService {
 
       return { data: updatedUser, payload, removePayload };
     } else {
-      console.log(userData.followRequests);
       userData.followRequests = userData.followRequests.filter(
         (requestId) => requestId.toString() !== senderId
       );
@@ -400,9 +401,9 @@ class UserService {
       case "GET_USER":
         return this.repository.findUserById(data);
         break;
-        case "GET_EVENT_iNVITES":
-          return this.repository.getEventInvites(data)
-          break;
+      case "GET_EVENT_iNVITES":
+        return this.repository.getEventInvites(data);
+        break;
       default:
         break;
     }

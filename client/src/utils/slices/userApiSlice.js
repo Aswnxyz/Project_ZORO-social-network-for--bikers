@@ -103,6 +103,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
         params: data,
       }),
     }),
+    searchAllUsers: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/searchAllUsers`,
+        method: "GET",
+        params: data,
+      }),
+    }),
     addToRecentSearch: builder.mutation({
       query: (data) => ({
         url: `${USERS_URL}/addRecentSearch`,
@@ -174,5 +181,6 @@ export const {
   useGetUserDataMutation,
   useChangePasswordMutation,
   useChangeToPrivateAccountMutation,
-  useManageFollowRequestMutation
+  useManageFollowRequestMutation,
+  useSearchAllUsersMutation
 } = userApiSlice;

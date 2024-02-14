@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
+import { NOTIFICATION_SERVICE } from "../constants/constant";
 
-const socket = io("https://zoro.shopzen.in.net/api/notification");
+const socket = io(NOTIFICATION_SERVICE);
 
 export default socket;

@@ -21,8 +21,9 @@ import { LuDot } from "react-icons/lu";
 import { BsThreeDots } from "react-icons/bs";
 import { IoCall, IoVideocamOutline } from "react-icons/io5";
 import { PiVideoCameraBold } from "react-icons/pi";
+import { MESSAGE_SERVICE } from "../constants/constant";
 
-const ENDPOINT = "https://zoro.shopzen.in.net/api/message";
+const ENDPOINT = MESSAGE_SERVICE;
 
 let socket, selectedChatCompare;
 

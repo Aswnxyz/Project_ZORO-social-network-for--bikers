@@ -25,7 +25,6 @@ module.exports = (app, channel) => {
 
   router.post("/login", async (req, res, next) => {
     try {
-      console.log('success')
       const userData = req.body;
       const data = await service.signIn(userData, res);
 
@@ -58,7 +57,6 @@ module.exports = (app, channel) => {
   });
 
   router.get("/getUser", userAuth, async (req, res, next) => {
-          console.log('success')
 
     try {
       const data = await service.repository.findUserById(req.user._id);
@@ -149,12 +147,21 @@ module.exports = (app, channel) => {
   });
   router.get("/searchUsers", userAuth, async (req, res, next) => {
     try {
-      const data = await service.repository.searchUser(req.query);
+      const data = await service.searchUsersFromFollowing(req.query,req.user._id);
       res.status(200).json(data);
     } catch (error) {
       next(error);
     }
   });
+
+  router.get('/searchAllUsers',userAuth,async(req,res,next)=>{
+try {
+  const data = await service.repository.searchUser(req.query);
+  res.status(200).json(data);
+} catch (error) {
+  next(error)
+}
+  })
 
   router.post("/addRecentSearch", userAuth, async (req, res, next) => {
     try {

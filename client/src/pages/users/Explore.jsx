@@ -3,14 +3,14 @@ import RightSidebar from "../../components/RightSidebar";
 import { BsSearch } from "react-icons/bs";
 import { useSelector } from "react-redux";
 import { IoMdClose } from "react-icons/io";
-import {  useAddToRecentSearchMutation, useClearRecentSearchMutation, useGetRecentSearcheMutation, useSearchUsersMutation } from "../../utils/slices/userApiSlice";
+import {  useAddToRecentSearchMutation, useClearRecentSearchMutation, useGetRecentSearcheMutation, useSearchAllUsersMutation, useSearchUsersMutation } from "../../utils/slices/userApiSlice";
 import { Link } from "react-router-dom";
 
 const Explore = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [recentSearches,setRecentSearches] = useState([]);
-  const [searchUser] = useSearchUsersMutation();
+  const [searchUser] = useSearchAllUsersMutation();
   const [addRecentSearch] = useAddToRecentSearchMutation();
   const [getRecentSearches] = useGetRecentSearcheMutation();
   const[clearRecentSearch]= useClearRecentSearchMutation()

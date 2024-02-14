@@ -52,6 +52,7 @@ const Notifications = () => {
   useEffect(() => {
     socket.emit("clearUnreadNotifications", userInfo.id);
     socket.on("notification", (newNotification) => {
+      console.log('new notf')
       setNotifications((prev) => [newNotification, ...prev]);
     });
     socket.on("removeNotification", (_id) => {

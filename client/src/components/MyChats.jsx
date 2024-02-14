@@ -29,8 +29,8 @@ const MyChats = ({ fetchagain, setMessagesInfo }) => {
   const handleSearch = async (value) => {
     try {
       const res = await searchUser({ searchInput: value }).unwrap();
-      const filteredUsers = res.filter((user) => userInfo.following.includes(user._id) );
-      setSearchResults(filteredUsers);
+      
+      setSearchResults(res);
     } catch (error) {
       console.error(error);
     }
