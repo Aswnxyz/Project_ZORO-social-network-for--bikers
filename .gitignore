@@ -3,3 +3,8 @@ k8s/secrets/
 .env.dev
 node_modules
 
+
+.env.*
+!.env.example
+*.pem
+*.key
